@@ -231,7 +231,7 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                 <div id="outer-file-input-container">
                     <span class="" id="file-input-container">
                         ファイルを選択
-                        <input type="file" required id="file-input" />
+                        <input type="file" id="file-input" />
                     </span> <span id="select-file-name">ファイルが選択されていません</span>
                 </div>
 
@@ -357,13 +357,15 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
 </body>
 <script>
 // file-inputボタンのイベント設定 : CSVの読み込み, header取得
-var file = document.getElementById('file-input');
+const file = $("#file-input");
+// var file = document.getElementById('file-input');
  
 // HTML5 のFile APIに対応している場合
 if (window.File && window.FileReader && window.FileList && window.Blob) {
-    function loadLocalCsv(e) {
+    function loadLocalCsv(target) {
         // ファイルデータ取得
-        var fileData = e.target.files[0];
+        var fileData = target.prop("files")[0];
+        // var fileData = e.target.files[0];
 
         if ($("#file-input").val().length == 0) {
             // セレクタを無効化
@@ -432,8 +434,6 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
 
                 const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
                 const noiseDiff = ($("#noise-diff-input").prop("disabled") ? "" : parseFloat($("#noise-diff-input").val()));
-
-                // console.log(noiseIndex, noiseDiff);
                 
                 // 点の描画
                 plotAllCircles(data, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
@@ -470,10 +470,22 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
         // ファイル読み込みを実行
         reader.readAsText(fileData);
     };
-    file.addEventListener('change', loadLocalCsv, false);
+    file.on("change", function(){
+        if ($(this).prop('files').length == 0) {
+            $("#select-file-name").text("ファイルが選択されていません");
+        } else {
+            var file_name = $(this).prop('files')[0].name;
+            $("#select-file-name").text(file_name);
+        }
+        loadLocalCsv($(this));
+    });
+    file.on("click", function(){
+        $(this).val('');
+    });
  
 } else {
-    file.style.display = 'none';
+    // file.style.display = 'none';
+    file.css("display", "none");
     result.innerHTML = 'File APIに対応したブラウザでご確認ください';
 }
 </script>
@@ -702,16 +714,6 @@ $(function(){
     // マップの透明度に合わせて, レンジバーの透過
     $("#opacity-input").on("input", function() {
         $(this).css("background-color", `rgba(21, 177, 224, ${$(this).val()})`);
-    });
-
-    // 選択したファイル名の表示
-    $('#file-input').on('change', function() {
-        if ($(this).prop('files').length == 0) {
-            $("#select-file-name").text("ファイルが選択されていません");
-        } else {
-            var file_name = $(this).prop('files')[0].name;
-            $("#select-file-name").text(file_name);
-        }
     });
 
     // モーダルのNaNに対するチェックボックスの変更
