@@ -433,7 +433,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
                 const noiseDiff = ($("#noise-diff-input").prop("disabled") ? "" : parseFloat($("#noise-diff-input").val()));
 
-                console.log(noiseIndex, noiseDiff);
+                // console.log(noiseIndex, noiseDiff);
                 
                 // 点の描画
                 plotAllCircles(data, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
@@ -516,6 +516,8 @@ $('#reset-pos-button').on("click", function() {
     return false;
 });
 
+$("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
+
 // タイルの取得
 function getTilesDict(opacity) {
     return {
@@ -561,11 +563,13 @@ function updateTiles(opacity) {
         if (map.hasLayer(overLayers[key])) map.removeLayer(overLayers[key]);
     }
     
-    
     // レイヤーコントローラーの削除と更新
     layersControl.remove();
     overLayers = getTilesDict(opacity);
     layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
+
+    // レイヤの7番目をクリック
+    $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
 }
 
 // 円のプロットのための関数
@@ -584,7 +588,6 @@ function plotAllCircles(data, latIndex, lngIndex, powIndex, powMin, powMax, thre
             continue;
         }
 
-        
         const lat = parseFloat(data[i][latIndex]);
         const lng = parseFloat(data[i][lngIndex]);
         const pow = parseFloat(data[i][powIndex]);
