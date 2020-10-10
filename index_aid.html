@@ -494,44 +494,50 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
 </script>
 <script>
 // ------ マップ描画関係 ------
-
 const initPos = [35.7, 139.75];
 const initOpacity = 1.0;
 
-// マップインスタンス生成
-let map = L.map(
-    "map-container",
-    {
-        center: initPos,
-        crs: L.CRS.EPSG3857,
-        zoom: 13,
-        zoomControl: true,
-        preferCanvas: false,
-    }
-);
+$(function(){
+    // マップインスタンス生成
+    let map = L.map(
+        "map-container",
+        {
+            center: initPos,
+            crs: L.CRS.EPSG3857,
+            zoom: 13,
+            zoomControl: true,
+            preferCanvas: false,
+        }
+    );
 
-// 縮尺の表示
-L.control.scale({
-    imperial: true,
-    metric: true
-}).addTo(map);
+    // 縮尺の表示
+    L.control.scale({
+        imperial: true,
+        metric: true
+    }).addTo(map);
+    
+    // タイルレイヤーの追加とレイヤーコントローラの追加
+    let baseLayers = {};
+    let overLayers = getTilesDict(initOpacity);
+    let layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
+    
+    // ズームコントローラの追加
+    map.zoomControl.setPosition("bottomright");
+    
+    // 初期位置ボタンの挙動追加
+    $('#reset-pos-button').off("click");
+    $('#reset-pos-button').on("click", function() {
+        resetPos(...initPos);
+        return false;
+    });
+    
+    // 初期タイル選択
+    $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
 
-// タイルレイヤーの追加とレイヤーコントローラの追加
-let baseLayers = {};
-let overLayers = getTilesDict(initOpacity);
-let layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
-
-// ズームコントローラの追加
-map.zoomControl.setPosition("bottomright");
-
-// 初期位置ボタンの挙動追加
-$('#reset-pos-button').off("click");
-$('#reset-pos-button').on("click", function() {
-    resetPos(...initPos);
-    return false;
+    // 
 });
 
-$("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
+
 
 // タイルの取得
 function getTilesDict(opacity) {
