@@ -9,7 +9,7 @@ function outputHTML(data, powMin, powMax, radius, threshold, plotNan, opacity, i
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <!-- <script src="https://unpkg.com/d3"></script> -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="https://unpkg.com/d3fc"></script>
+<script src="https://unpkg.com/d3fc@15.0.8/build/d3fc.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css" rel="stylesheet"/>
 <script> // 色変換の関数定義
@@ -219,7 +219,7 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
     let styleTxt = function () {/*
 <style>
 #colorbar-container {
-    opacity: 0;
+    opacity: 1;
 
     position: absolute;
     bottom: 3rem;
