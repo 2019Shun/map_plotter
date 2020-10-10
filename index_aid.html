@@ -433,7 +433,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 const reverseHeatmap = $("#reverse-heatmap-input").prop("checked");
 
                 const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
-                const noiseDiff = ($("#noise-diff-input").prop("disabled") ? "" : parseFloat($("#noise-diff-input").val()));
+                const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
                 
                 // 点の描画
                 plotAllCircles(data, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
