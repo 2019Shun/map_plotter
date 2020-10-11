@@ -12,8 +12,8 @@
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css" rel="stylesheet"/>
 <!-- for semantic ui -->
-<link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
-<script src="semantic/dist/semantic.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="./outputHTML.js"></script>
 <script> // 色変換の関数定義
@@ -223,6 +223,11 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
         <a class="js-modal-open" href="">プロットする</a>
         <a id="reset-pos-button" href="">初期位置へ</a>
         <a id="save-button" href="">保存する</a>
+    </div>
+
+    <div id="layer-opacity-slider-container">
+        <input type="range" class="" id="layer-opacity-slider" min="0" max="1" step="0.1" val="0.5">
+        <!-- <label for="layer-opacity-slider">opacity-slider</label> -->
     </div>
 
     <div id="colorbar-container"></div>
@@ -497,18 +502,24 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
 const initPos = [35.7, 139.75];
 const initOpacity = 1.0;
 
+// マップインスタンス生成
+let map = L.map(
+    "map-container",
+    {
+        center: initPos,
+        crs: L.CRS.EPSG3857,
+        zoom: 13,
+        zoomControl: true,
+        preferCanvas: false,
+    }
+);
+
+// タイルレイヤーの追加とレイヤーコントローラの追加
+let baseLayers = {};
+let overLayers = getTilesDict(initOpacity);
+let layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
+
 $(function(){
-    // マップインスタンス生成
-    let map = L.map(
-        "map-container",
-        {
-            center: initPos,
-            crs: L.CRS.EPSG3857,
-            zoom: 13,
-            zoomControl: true,
-            preferCanvas: false,
-        }
-    );
 
     // 縮尺の表示
     L.control.scale({
@@ -516,10 +527,6 @@ $(function(){
         metric: true
     }).addTo(map);
     
-    // タイルレイヤーの追加とレイヤーコントローラの追加
-    let baseLayers = {};
-    let overLayers = getTilesDict(initOpacity);
-    let layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
     
     // ズームコントローラの追加
     map.zoomControl.setPosition("bottomright");
@@ -534,10 +541,28 @@ $(function(){
     // 初期タイル選択
     $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
 
-    // 
+    // 透過スライダー位置決めとイベントの追加
+    updateLayerOpacitySliderPos();
+    const inner_width = $("div.leaflet-control-container>div.leaflet-top.leaflet-right a").width();
+    $("div#layer-opacity-slider-container").css("height", `${inner_width}px`);
+    $("div.leaflet-control-layers.leaflet-control").on("mouseenter", function(){
+        updateLayerOpacitySliderPos();
+    });
+    $("div.leaflet-control-layers.leaflet-control").on("mouseleave", function(){
+        updateLayerOpacitySliderPos();
+    });
+    $("div#layer-opacity-slider-container>input[type=range]").on("input", function(){
+        $(this).css("background-color", `rgba(20, 128, 230, ${$(this).val()})`);
+        updateTiles($(this).val());
+    });
 });
 
-
+// 透過スライダー位置更新
+function updateLayerOpacitySliderPos(){
+    const pos_top = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").offset().top;
+    const outer_height = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").outerHeight();
+    $("div#layer-opacity-slider-container").css("top", `${pos_top + outer_height + 10}px`);
+}
 
 // タイルの取得
 function getTilesDict(opacity) {
@@ -577,8 +602,17 @@ function getTilesDict(opacity) {
     }
 }
 
-// タイルの更新
+
+// タイルの更新(選択中のタイルを引き継ぐ)
 function updateTiles(opacity) {
+    const layerNum = Object.keys(overLayers).length;
+    let checkedList = Array(layerNum);
+
+    // 現在選択中のレイヤを判別
+    for (let idx = 0; idx < layerNum; idx++) {
+        checkedList[idx] = $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(idx).prop('checked');
+    }
+
     // 描画中のタイルレイヤーの削除
     for (let key in overLayers) {
         if (map.hasLayer(overLayers[key])) map.removeLayer(overLayers[key]);
@@ -589,8 +623,10 @@ function updateTiles(opacity) {
     overLayers = getTilesDict(opacity);
     layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
 
-    // レイヤの7番目をクリック
-    $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
+    // レイヤを選択する
+    for (let idx = 0; idx < layerNum; idx++) {
+        if (checkedList[idx]) $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(idx).trigger("click");
+    }
 }
 
 // 円のプロットのための関数
