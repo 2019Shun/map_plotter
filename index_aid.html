@@ -245,117 +245,140 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
 
                 <div class="form-divider"></div>
 
-                <div class="input-container">
-                    <label><span id="req-red">(必須)</span>カラーバー最小値</label>
-                    <input type="number" class="have-ul" required id="pow-min-input" value="-130" placeholder="カラーバー最低値" />
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label><span id="req-red">(必須)</span>カラーバー最大値</label>
-                    <input type="number" class="have-ul" required id="pow-max-input" value="-90" placeholder="カラーバー最大値" />
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label><span id="req-red">(必須)</span>描画点の大きさ</label>
-                    
-                    <select class="have-ul" required id="radius-selector">
-                        <option value="2">2</option>
-                        <option value="4">4</option>
-                        <option value="6">6</option>
-                        <option value="8">8</option>
-                        <option value="10">10</option>
-                        <option value="15" selected>15</option>
-                        <option value="20">20</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                        <option value="80">80</option>
-                        <option value="200">200</option>
-                        <option value="500">500</option>
-                        <option value="1000">1000</option>
-                        <option value="2000">2000</option>
-                        <option value="5000">5000</option>
-                        <option value="10000">10000</option>
-                        <option value="20000">20000</option>
-                    </select>
-                    
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label>描画閾値 (この値以上の点のみ描画される)</label>
-                    <input type="number" class="have-ul" id="threshold-input" value="" placeholder="閾値" />
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label>NaNの点(値の無い点)を描画</label>
-                    <input type="checkbox" class="have-ul" id="plot-nan-input" checked/>
-                    <label for="plot-nan-input">する</label>
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label>マップの透明度</label>
-                    <input type="range" id="opacity-input" min="0.1" max="1" step="0.05" value="1"/>
-                </div>
-                <div class="input-container">
-                    <label>ヒートマップテーマの選択</label>
-                    
-                    <select class="have-ul" required id="theme-selector">
-                        <option value="red-blue">Red → Blue</option>
-                        <option value="red">Red</option>
-                        <option value="blue">Blue</option>
-                        <option value="green">Green</option>
-                        <option value="grey">Grey</option>
-                        <option value="orange">Orange</option>
-                        <option value="spectral">spectral</option>
-                        <option value="viridis">viridis</option>
-                        <option value="inferno">inferno</option>
-                        <option value="plasma">plasma</option>
-                        <option value="cool">cool</option>
-                        <option value="jet" selected>jet</option>
-                    </select>
-                    
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label>ヒートマップの向きは</label>
-                    <input type="checkbox" class="have-ul" id="reverse-heatmap-input"/>
-                    <label for="reverse-heatmap-input">順方向</label>
-                    <div class="form-underline"></div>
-                </div>
-                <div class="form-divider"></div>
-                <div class="input-container">
-                    <label><span id="req-red">(必須)</span>緯度(Latitude)の列</label>
-                    <select class="have-ul index-selector" required id="lat-index-selector" disabled></select>
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label><span id="req-red">(必須)</span>経度(Longitude)の列</label>
-                    <select class="have-ul index-selector" required id="lng-index-selector" disabled></select>
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label><span id="req-red">(必須)</span>電力の列</label>
-                    <select class="have-ul index-selector" required id="pow-index-selector" disabled></select>
-                    <div class="form-underline"></div>
-                </div>
+                <fieldset>
+                    <legend>描画の設定</legend>
+
+                    <div class="input-container">
+                        <label><span id="req-red">(必須)</span>カラーバー最小値</label>
+                        <input type="number" class="have-ul" required id="pow-min-input" value="-130" placeholder="カラーバー最低値" />
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label><span id="req-red">(必須)</span>カラーバー最大値</label>
+                        <input type="number" class="have-ul" required id="pow-max-input" value="-90" placeholder="カラーバー最大値" />
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label><span id="req-red">(必須)</span>描画点の大きさ</label>
+                        
+                        <select class="have-ul" required id="radius-selector">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="15" selected>15</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="80">80</option>
+                            <option value="200">200</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                            <option value="2000">2000</option>
+                            <option value="5000">5000</option>
+                            <option value="10000">10000</option>
+                            <option value="20000">20000</option>
+                        </select>
+                        
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label>描画閾値 (この値以上の点のみ描画される)</label>
+                        <input type="number" class="have-ul" id="threshold-input" value="" placeholder="閾値" />
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label>NaNの点(値の無い点)を描画</label>
+                        <input type="checkbox" class="have-ul" id="plot-nan-input" checked/>
+                        <label for="plot-nan-input">する</label>
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label>マップの透明度</label>
+                        <input type="range" id="opacity-input" min="0.1" max="1" step="0.05" value="1"/>
+                    </div>
+                </fieldset>
 
                 <div class="form-divider"></div>
-                
-                <div class="input-container">
-                    <label>ノイズの列</label>
-                    <select class="have-ul index-selector" id="noise-index-selector" disabled></select>
-                    <div class="form-underline"></div>
-                </div>
-                <div class="input-container">
-                    <label><span id="req-red"></span>信号ノイズ差([電力-ノイズ]がこの値以上だと描画される)</label>
-                    <input type="number" class="have-ul" required id="noise-diff-input" value="" placeholder="信号ノイズ差" disabled/>
-                    <div class="form-underline"></div>
-                </div>
+
+                <fieldset>
+                    <legend>ヒートマップの設定</legend>
+
+                    <div class="input-container">
+                        <label>ヒートマップテーマの選択</label>
+                        
+                        <select class="have-ul" required id="theme-selector">
+                            <option value="red-blue">Red → Blue</option>
+                            <option value="red">Red</option>
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="grey">Grey</option>
+                            <option value="orange">Orange</option>
+                            <option value="spectral">spectral</option>
+                            <option value="viridis">viridis</option>
+                            <option value="inferno">inferno</option>
+                            <option value="plasma">plasma</option>
+                            <option value="cool">cool</option>
+                            <option value="jet" selected>jet</option>
+                        </select>
+                        
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label>ヒートマップの向きは</label>
+                        <input type="checkbox" class="have-ul" id="reverse-heatmap-input"/>
+                        <label for="reverse-heatmap-input">順方向</label>
+                        <div class="form-underline"></div>
+                    </div>
+                </fieldset>
+
+                <div class="form-divider"></div>
+
+                <fieldset>
+                    <legend>カラムの選択</legend>
+
+                    <div class="input-container">
+                        <label><span id="req-red">(必須)</span>緯度(Latitude)の列</label>
+                        <select class="have-ul index-selector" required id="lat-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label><span id="req-red">(必須)</span>経度(Longitude)の列</label>
+                        <select class="have-ul index-selector" required id="lng-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label><span id="req-red">(必須)</span>電力の列</label>
+                        <select class="have-ul index-selector" required id="pow-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
+                </fieldset>
+
+
+                <div class="form-divider"></div>
+
+                <fieldset>
+                    <legend>ノイズの設定</legend>
+
+                    <div class="input-container">
+                        <label>ノイズの列</label>
+                        <select class="have-ul index-selector" id="noise-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label><span id="req-red"></span>信号ノイズ差([電力-ノイズ]がこの値以上だと描画される)</label>
+                        <input type="number" class="have-ul" required id="noise-diff-input" value="" placeholder="信号ノイズ差" disabled/>
+                        <div class="form-underline"></div>
+                    </div>
+                </fieldset>
 
                 <div class="form-divider"></div>
                 
                 <div id="decide-button-container">
                     <input type="button" id="decide-button" value="プロットする" disabled/>
                 </div>
+                
             </form>
             <div id="modal-close-button">
                 <a class="js-modal-close" href="">戻る</a>
