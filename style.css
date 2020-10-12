@@ -141,9 +141,6 @@
     width: 60%;
     height: 70vh;
 }
-
-
-
 /* ----- ファイル入力フォーム ----- */
 #outer-file-input-container {
     text-align: left;
@@ -177,9 +174,6 @@
     height: 100%;
     cursor: pointer;
 }
-
-
-
 /* ----- 各パラメータ入力のCSS ----- */
 .input-container select:disabled {
     background-color: rgba(0,0,0,0.15);
@@ -207,9 +201,6 @@
     position: relative; /*.form-underline::beforeの親要素*/
     border-top: 2px solid #c2c2c2; /*text3の下線*/
 }
-
-
-
 /* ----- フォームのアニメーション用 ----- */
 .form-underline::before,
 .form-underline::after{
@@ -237,24 +228,18 @@
     width: 50%;
 }
 
-
-
 /* ----- フォーム内の区切り ----- */
 .form-divider {
     height: 1.5rem;
     width: 100%;
     /* border-top: 1px dashed rgba(0, 0, 0, 0.7); */
 }
-
-
-
 /* ----- 戻るボタンの装飾 ----- */
 #modal-close-button {
     margin-top: 2rem;
     text-align: center;
     width: 100%;
 }
-
 #modal-close-button>a {
     display: inline-block;
     padding: 1rem 0;
@@ -269,7 +254,6 @@
 
     transition: .3s;
 }
-
 #modal-close-button>a:hover {
     background-color: rgba(0,0,0,0.95);
     /* color: rgb(244, 244, 244); */
@@ -278,21 +262,16 @@
 #modal-close-button>a:visited {
     color: rgb(244, 244, 244);
 }
-
-
-
 /* ----- 決定ボタンの装飾 ----- */
 #decide-button-container {
     margin-top: 2rem;
     text-align: center;
     width: 100%;
 }
-
 #decide-button-container input {
     transition: 0.3s;
     box-shadow: 0.5rem 0.5rem 0.5rem rgba(0,0,0,0.2);
 }
-
 #decide-button-container input:disabled {
     display: inline-block;
     padding: 1rem 0;
@@ -307,7 +286,6 @@
 
     border: none;
 }
-
 #decide-button-container input:enabled {
     display: inline-block;
     padding: 1rem;
@@ -324,24 +302,20 @@
     
     box-shadow: 0.5rem 0.5rem 0.5rem rgba(0,0,0,0.2);
 }
-
 #decide-button-container>input:enabled:hover {
     background-color: rgb(240, 122, 44);
 }
-
 #decide-button-container>input:active {
     background-color: rgb(240, 122, 44);
     border: none;
     outline: none;
     box-shadow: 0.3rem 0.3rem 0.3rem rgba(0,0,0,0.5);
 }
-
 /* ----- モーダル内のチャックボックス ----- */
 .input-container>input[type="checkbox"] {
     display: none;
     width: auto;
 }
-
 .input-container>input[type="checkbox"] + label {
     display: inline-block;
 
@@ -355,13 +329,10 @@
     padding: 0.3rem 0.6rem;
     margin: 0.2rem;
 }
-
 .input-container>input[type="checkbox"]:checked + label {
     background-color: #eb6035;
     box-shadow: 0 4px 4px rgba(0,0,0,0.2), 0 -4px 5px -2px #ce846d inset;
 }
-
-
 /* ----- モーダルのレンジ入力 ----- */
 .input-container>input[type="range"] {
     -webkit-appearance: none;
@@ -394,6 +365,20 @@
     border: none;
     border-radius: 1rem;
     -webkit-border-radius: 1rem;
+}
+/* ----- モーダル : 各セクション ----- */
+div.modal-content fieldset {
+    /* background-color: rgba(150, 150, 150, 0.1); */
+    padding: 0 1rem .7rem;
+    border-color: rgba(0, 0, 0, 0);
+    border-radius: 1rem;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+}
+div.modal-content fieldset>legend {
+    background-color: rgba(255, 255, 255, 1);
+    padding: 5px 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
 }
 
 /* ----- 観測点のポップアップ ----- */
