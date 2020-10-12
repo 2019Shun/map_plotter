@@ -259,25 +259,24 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
-                        <label><span id="req-red">(必須)</span>描画点の大きさ</label>
+                        <label>描画点の大きさ</label>
                         
                         <select class="have-ul" required id="radius-selector">
+                            <option value="1">1</option>
                             <option value="2">2</option>
+                            <option value="3">3</option>
                             <option value="4">4</option>
-                            <option value="6">6</option>
+                            <option value="5">5</option>
                             <option value="8">8</option>
-                            <option value="10">10</option>
-                            <option value="15" selected>15</option>
+                            <option value="10" selected>10</option>
+                            <option value="15">15</option>
                             <option value="20">20</option>
                             <option value="30">30</option>
                             <option value="50">50</option>
-                            <option value="80">80</option>
-                            <option value="200">200</option>
+                            <option value="100">100</option>
                             <option value="500">500</option>
                             <option value="1000">1000</option>
-                            <option value="2000">2000</option>
                             <option value="5000">5000</option>
-                            <option value="10000">10000</option>
                             <option value="20000">20000</option>
                         </select>
                         
@@ -286,6 +285,26 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                     <div class="input-container">
                         <label>描画閾値 (この値以上の点のみ描画される)</label>
                         <input type="number" class="have-ul" id="threshold-input" value="" placeholder="閾値" />
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="input-container">
+                        <label>描画ステップ数(仮)</label>
+                        
+                        <select class="have-ul" id="step-selector">
+                            <option value="1" selected>1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
+                        
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
@@ -453,6 +472,8 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 const powMax = parseInt($("#pow-max-input").val());
 
                 const radius = parseInt($("#radius-selector").val());
+
+                const step = parseInt($("#step-selector").val());
                 
                 const threshold = parseFloat($("#threshold-input").val());
                 
@@ -467,7 +488,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
                 
                 // 点の描画
-                plotAllCircles(data, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
 
                 // カラーバーの作製/更新
                 updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap);
@@ -653,8 +674,8 @@ function updateTiles(opacity) {
 }
 
 // 円のプロットのための関数
-function plotAllCircles(data, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
-    for (let i=1; i<data.length; i++) {
+function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
+    for (let i=1; i<data.length; i+=step) {
         if (data[i].length < 3) {
             continue;
         }
