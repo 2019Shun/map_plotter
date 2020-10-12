@@ -546,14 +546,14 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 const powMax = parseInt($("#pow-max-input").val());
 
                 const radius = parseInt($("#radius-selector").val());
-
-                const step = parseInt($("#step-selector").val());
-                
                 const threshold = parseFloat($("#threshold-input").val());
-                
+                const step = parseInt($("#step-selector").val());
                 const plotNan = $("#plot-nan-input").prop("checked");
 
-                const opacity = parseFloat($("#opacity-input").val());
+                const fillCircle = $("#fill-circle-input").prop("checked");
+                const strokeWidth = parseInt($("#stroke-width-selector").val());
+                const fillOpacity = parseFloat($("#fill-opacity-selector").val());
+                const strokeOpacity = parseFloat($("#stroke-opacity-selector").val());
                 
                 const interpolateTheme = $("#theme-selector").val();
                 const reverseHeatmap = $("#reverse-heatmap-input").prop("checked");
@@ -562,7 +562,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
                 
                 // 点の描画
-                plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
 
                 // カラーバーの作製/更新
                 updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap);
@@ -587,7 +587,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
                 // カラーバーのコンテナ表示
                 $("#colorbar-container").fadeTo(500, 1);
 
-                updateTiles(opacity);
+                updateTiles(0.5);
 
                 return false;
             });
@@ -748,7 +748,7 @@ function updateTiles(opacity) {
 }
 
 // 円のプロットのための関数
-function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
+function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
     for (let i=1; i<data.length; i+=step) {
         if (data[i].length < 3) {
             continue;
@@ -777,7 +777,7 @@ function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax
         }
 
         const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
-
+        
         c = L.circle(
                 [lat, lng],
                 {
@@ -785,16 +785,16 @@ function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax
                     "color": color,
                     "dashArray": null,
                     "dashOffset": null,
-                    "fill": true,
+                    "fill": fillCircle,
                     "fillColor": color,
-                    "fillOpacity": 1,
+                    "fillOpacity": fillOpacity,
                     "fillRule": "evenodd",
                     "lineCap": "round",
                     "lineJoin": "round",
-                    "opacity": 1,
+                    "opacity": strokeOpacity,
                     "radius": radius,
                     "stroke": true,
-                    "weight": 1
+                    "weight": strokeWidth
                 }
             ).addTo(map);
 
@@ -896,6 +896,15 @@ $(function(){
 
     // モーダルのNaNに対するチェックボックスの変更
     $("#plot-nan-input").on("change", function() {
+        if ($(this).prop("checked")) {
+            $(this).next().text("する");
+        } else {
+            $(this).next().text("しない");
+        }
+    });
+
+    // モーダルの円の塗りつぶしに対するチェックボックスの変更
+    $("#fill-circle-input").on("change", function() {
         if ($(this).prop("checked")) {
             $(this).next().text("する");
         } else {
