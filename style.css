@@ -145,6 +145,8 @@
 #outer-file-input-container {
     text-align: left;
     background-color: rgba(150, 150, 150, 0.1);
+    cursor: pointer;
+
 }
 #file-input-container {
     display: inline-block;
@@ -161,9 +163,13 @@
     font-weight: 700;
     background-color: #3590eb;
     box-shadow: 0 4px 4px rgba(0,0,0,0.2), 0 -4px 5px -2px #6d95ce inset;
+
+    cursor: pointer;
 }
 #file-input-container:hover {
     box-shadow: 0 4px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+
 }
 #file-input {
     opacity: 0;
@@ -328,6 +334,8 @@
     
     padding: 0.3rem 0.6rem;
     margin: 0.2rem;
+
+    cursor: pointer;
 }
 .input-container>input[type="checkbox"]:checked + label {
     background-color: #eb6035;
