@@ -856,16 +856,12 @@ $(function(){
     // 大小のチェック
     $("#pow-min-input").on("change", function() {
         if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
-            alert("最大値より最低値の方が大きくなっています");
-            $("#decide-button").prop("disabled", true).change();
-            $(this).val(parseInt($("#pow-max-input").val()) - 30);
+            $("#pow-max-input").val(parseInt($(this).val()) + 100);
         }
     });
     $("#pow-max-input").on("change", function() {
         if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
-            alert("最大値より最低値の方が大きくなっています");
-            $("#decide-button").prop("disabled", true).change();
-            $(this).val(parseInt($("#pow-min-input").val()) + 30);
+            $("#pow-min-input").val(parseInt($(this).val()) - 100);
         }
     });
 
