@@ -1,223 +1,241 @@
 <!DOCTYPE html>
 
 <head>
-<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
-<meta content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- <script src="https://unpkg.com/d3"></script> -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<!-- <script src="https://unpkg.com/d3fc"></script> -->
-<script src="https://unpkg.com/d3fc@15.0.8/build/d3fc.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css" rel="stylesheet"/>
-<!-- for semantic ui -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css">
-<script src="./outputHTML.js"></script>
-<script> // 色変換の関数定義
-//The steps in the jet colorscale
-const jet_data_lin = [
-    [0,0,0.5],
-    [0,0,1],
-    [0,0.5,1],
-    [0,1,1],
-    [0.5,1,0.5],
-    [1,1,0],
-    [1,0.5,0],
-    [1,0,0],
-    [0.5,0,0]
-]
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- <script src="https://unpkg.com/d3"></script> -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- <script src="https://unpkg.com/d3fc"></script> -->
+    <script src="https://unpkg.com/d3fc@15.0.8/build/d3fc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css" rel="stylesheet" />
+    <!-- for semantic ui -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="./outputHTML.js"></script>
+    <script> // 色変換の関数定義
+        //The steps in the jet colorscale
+        const jet_data_lin = [
+            [0, 0, 0.5],
+            [0, 0, 1],
+            [0, 0.5, 1],
+            [0, 1, 1],
+            [0.5, 1, 0.5],
+            [1, 1, 0],
+            [1, 0.5, 0],
+            [1, 0, 0],
+            [0.5, 0, 0]
+        ]
 
-const jet_rgb = jet_data_lin.map(x => {
-    return d3.rgb.apply(null, x.map(y=>y*255))
-})
+        const jet_rgb = jet_data_lin.map(x => {
+            return d3.rgb.apply(null, x.map(y => y * 255))
+        })
 
-jetInterpList = new Array(jet_rgb.length-1);
-for (let i=0;i<jet_rgb.length-1;i++) {
-    jetInterpList[i] = d3.interpolateRgb(jet_rgb[i], jet_rgb[i+1])
-}
+        jetInterpList = new Array(jet_rgb.length - 1);
+        for (let i = 0; i < jet_rgb.length - 1; i++) {
+            jetInterpList[i] = d3.interpolateRgb(jet_rgb[i], jet_rgb[i + 1])
+        }
 
-function interpJet(pow) {
-    if (!(0 <= pow && pow <= 1)) return "rgb(0, 0, 0)";
+        function interpJet(pow) {
+            if (!(0 <= pow && pow <= 1)) return "rgb(0, 0, 0)";
 
-    const n = jet_rgb.length-1;
+            const n = jet_rgb.length - 1;
 
-    var i = Math.max(0, Math.min(n - 1, Math.floor(pow *= n)));
-    return jetInterpList[i](pow - i);
-};
-</script>
-<script>
-// 関数定義
-function norm(x, min, max) { // 電力値の正規化
-    if (x > max) return 1;
-    if (x < min) return 0;
-    return (x - min) / (max - min);
-};
-function readCsv(data) {
-    var csv = $.csv.toArrays(data);
-};
-function getInterpolationFunc(interpolateTheme, reverseHeatmap) {
-    let f = function() {};
-    switch (interpolateTheme) {
-        case "red-blue":
-            f = d3.interpolateRdBu;
-            break;
-        
-        case "red":
-            f = d3.interpolateReds;
-            break;
-        
-        case "blue":
-            f = d3.interpolateBlues;
-            break;
-        
-        case "green":
-            f = d3.interpolateGreens;
-            break;
-        
-        case "grey":
-            f = d3.interpolateGreys;
-            break;
-        
-        case "orange":
-            f = d3.interpolateOranges;
-            break;
+            var i = Math.max(0, Math.min(n - 1, Math.floor(pow *= n)));
+            return jetInterpList[i](pow - i);
+        };
+    </script>
+    <script>
+        // 関数定義
+        function norm(x, min, max) { // 電力値の正規化
+            if (x > max) return 1;
+            if (x < min) return 0;
+            return (x - min) / (max - min);
+        };
+        function readCsv(data) {
+            var csv = $.csv.toArrays(data);
+        };
+        function getInterpolationFunc(interpolateTheme, reverseHeatmap) {
+            let f = function () { };
+            switch (interpolateTheme) {
+                case "red-blue":
+                    f = d3.interpolateRdBu;
+                    break;
 
-        case "spectral":
-            f = d3.interpolateSpectral;
-            break;
-        
-        case "viridis":
-            f = d3.interpolateViridis;
-            break;
+                case "red":
+                    f = d3.interpolateReds;
+                    break;
 
-        case "inferno":
-            f = d3.interpolateInferno;
-            break;
-        
-        case "plasma":
-            f = d3.interpolatePlasma;
-            break;
-        
-        case "cool":
-            f = d3.interpolateCool;
-            break;
-        
-        case "jet":
-            f = interpJet;
-            break;
+                case "blue":
+                    f = d3.interpolateBlues;
+                    break;
 
-        default:
-            f = d3.interpolateSpectral;
-    }
+                case "green":
+                    f = d3.interpolateGreens;
+                    break;
 
-    if (reverseHeatmap) {
-        return function(x) {return f(1-x)};
-    } else {
-        return f;
-    }
-};
-function cvtPow2Color(pow, min, max, interpolateTheme, reverseHeatmap) {
-    return getInterpolationFunc(interpolateTheme, reverseHeatmap)(norm(pow, min, max));
-};
-function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // カラーバーの更新
-    $("#colorbar-container").empty();
+                case "grey":
+                    f = d3.interpolateGreys;
+                    break;
 
-    const domain = [powMin, powMax]; // カラーバーの値のレンジ
-    const height = Math.floor(38 * $(window).height()/100);
-    const width = 200;
-    const svgWidth = 130;
+                case "orange":
+                    f = d3.interpolateOranges;
+                    break;
 
-    // カラーバーの上下部にゆとりを持たせる.
-    const paddedDomain = fc.extentLinear()
-        .pad([0.1, 0.1])
-        .padUnit("percent")(domain);
-    const [min, max] = paddedDomain;
-    const expandedDomain = d3.range(min, max, (max - min) / height);
-    
-    // Band scale for x-axis
-    const xScale = d3
-        .scaleBand()
-        .domain([0, 1])
-        .range([0, width]);
+                case "spectral":
+                    f = d3.interpolateSpectral;
+                    break;
 
-    // Linear scale for y-axis
-    const yScale = d3
-        .scaleLinear()
-        .domain(paddedDomain)
-        .range([height, 0]);
+                case "viridis":
+                    f = d3.interpolateViridis;
+                    break;
 
-    const svgBar = fc
-        .autoBandwidth(fc.seriesSvgBar())
-        .xScale(xScale)
-        .yScale(yScale)
-        .crossValue(0)
-        .baseValue((_, i) => (i > 0 ? expandedDomain[i - 1] : 0))
-        .mainValue(d => d)
-        .decorate(selection => {
-        selection.selectAll("path").style("fill", d => getInterpolationFunc(interpolateTheme, reverseHeatmap)(norm(d, ...domain)));
-        // selection.selectAll("path").style("fill", d => d3.interpolateSpectral(norm(d, ...domain)));
-        // selection.selectAll("path").style("fill", d => console.log(d));
-        });
+                case "inferno":
+                    f = d3.interpolateInferno;
+                    break;
 
-    // Drawing the legend bar
-    const legendSvg = d3.select("#colorbar-container").append("svg")
-        .attr("height", height)
-        .attr("width", svgWidth)
-        .attr("viewBox", `0, 0, ${svgWidth}, ${height}`)
-        .attr("id", "colorbar");
-    const legendBar = legendSvg
-        .append("g")
-        .datum(expandedDomain)
-        .call(svgBar);
+                case "plasma":
+                    f = d3.interpolatePlasma;
+                    break;
 
-    tickValues = [...domain, 
-        domain[0] + (domain[1] - domain[0]) / 5,
-        domain[0] + 2*(domain[1] - domain[0]) / 5,
-        domain[0] + 3*(domain[1] - domain[0]) / 5,
-        domain[0] + 4*(domain[1] - domain[0]) / 5]
+                case "cool":
+                    f = d3.interpolateCool;
+                    break;
 
-    // Removing the outer ticks
-    const axisLabel = fc
-        .axisRight(yScale)
-        .tickValues(tickValues)
-        .tickSizeOuter(0)
-        .decorate((s) =>
-            s.enter()
-                .select("text")
-                .style("font-size", "20"));
-            
-    // Drawing and translating the label
-    const barWidth = Math.abs(legendBar.node().getBBox().x);
-    legendSvg.append("g")
-        .attr("transform", `translate(${barWidth})`)
-        .datum(expandedDomain)
-        .call(axisLabel);
-    
-    // Hiding the vertical line
-    legendSvg.append("g")
-        .attr("transform", `translate(${barWidth})`)
-        .datum(expandedDomain)
-        .call(axisLabel)
-        .select(".domain")
-        .attr("visibility", "hidden");
+                case "jet":
+                    f = interpJet;
+                    break;
 
-    $(window).off('resize');
-    $(window).on('resize', function(){
-        legendSvg.attr("height", Math.floor(38 * $(window).height()/100));
-    });
+                default:
+                    f = d3.interpolateSpectral;
+            }
 
-}
-</script>
-<style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
-<style>#map-container {position: relative;width: 100.0%;height: 100.0%;left: 0;top: 0;z-index: 0;}</style>
+            if (reverseHeatmap) {
+                return function (x) { return f(1 - x) };
+            } else {
+                return f;
+            }
+        };
+        function cvtPow2Color(pow, min, max, interpolateTheme, reverseHeatmap) {
+            return getInterpolationFunc(interpolateTheme, reverseHeatmap)(norm(pow, min, max));
+        };
+        function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // カラーバーの更新
+            $("#colorbar-container").empty();
+
+            const domain = [powMin, powMax]; // カラーバーの値のレンジ
+            const height = Math.floor(38 * $(window).height() / 100);
+            const width = 200;
+            const svgWidth = 130;
+
+            // カラーバーの上下部にゆとりを持たせる.
+            const paddedDomain = fc.extentLinear()
+                .pad([0.1, 0.1])
+                .padUnit("percent")(domain);
+            const [min, max] = paddedDomain;
+            const expandedDomain = d3.range(min, max, (max - min) / height);
+
+            // Band scale for x-axis
+            const xScale = d3
+                .scaleBand()
+                .domain([0, 1])
+                .range([0, width]);
+
+            // Linear scale for y-axis
+            const yScale = d3
+                .scaleLinear()
+                .domain(paddedDomain)
+                .range([height, 0]);
+
+            const svgBar = fc
+                .autoBandwidth(fc.seriesSvgBar())
+                .xScale(xScale)
+                .yScale(yScale)
+                .crossValue(0)
+                .baseValue((_, i) => (i > 0 ? expandedDomain[i - 1] : 0))
+                .mainValue(d => d)
+                .decorate(selection => {
+                    selection.selectAll("path").style("fill", d => getInterpolationFunc(interpolateTheme, reverseHeatmap)(norm(d, ...domain)));
+                    // selection.selectAll("path").style("fill", d => d3.interpolateSpectral(norm(d, ...domain)));
+                    // selection.selectAll("path").style("fill", d => console.log(d));
+                });
+
+            // Drawing the legend bar
+            const legendSvg = d3.select("#colorbar-container").append("svg")
+                .attr("height", height)
+                .attr("width", svgWidth)
+                .attr("viewBox", `0, 0, ${svgWidth}, ${height}`)
+                .attr("id", "colorbar");
+            const legendBar = legendSvg
+                .append("g")
+                .datum(expandedDomain)
+                .call(svgBar);
+
+            tickValues = [...domain,
+            domain[0] + (domain[1] - domain[0]) / 5,
+            domain[0] + 2 * (domain[1] - domain[0]) / 5,
+            domain[0] + 3 * (domain[1] - domain[0]) / 5,
+            domain[0] + 4 * (domain[1] - domain[0]) / 5]
+
+            // Removing the outer ticks
+            const axisLabel = fc
+                .axisRight(yScale)
+                .tickValues(tickValues)
+                .tickSizeOuter(0)
+                .decorate((s) =>
+                    s.enter()
+                        .select("text")
+                        .style("font-size", "20"));
+
+            // Drawing and translating the label
+            const barWidth = Math.abs(legendBar.node().getBBox().x);
+            legendSvg.append("g")
+                .attr("transform", `translate(${barWidth})`)
+                .datum(expandedDomain)
+                .call(axisLabel);
+
+            // Hiding the vertical line
+            legendSvg.append("g")
+                .attr("transform", `translate(${barWidth})`)
+                .datum(expandedDomain)
+                .call(axisLabel)
+                .select(".domain")
+                .attr("visibility", "hidden");
+
+            $(window).off('resize');
+            $(window).on('resize', function () {
+                legendSvg.attr("height", Math.floor(38 * $(window).height() / 100));
+            });
+
+        }
+    </script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <style>
+        #map-container {
+            position: relative;
+            width: 100.0%;
+            height: 100.0%;
+            left: 0;
+            top: 0;
+            z-index: 0;
+        }
+    </style>
 </head>
+
 <body>
     <!-- leafletのマップ -->
     <div class="folium-map" id="map-container"></div>
-    
+
     <!-- プロット関連のモーダルウィンドウの表示ボタン -->
     <div id="opt-button-container">
         <a class="js-modal-open" href="">プロットする</a>
@@ -250,17 +268,19 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
 
                     <div class="input-container">
                         <label><span id="req-red">(必須)</span>カラーバー最小値</label>
-                        <input type="number" class="have-ul" required id="pow-min-input" value="-130" placeholder="カラーバー最低値" />
+                        <input type="number" class="have-ul" required id="pow-min-input" value="-130"
+                            placeholder="カラーバー最低値" />
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
                         <label><span id="req-red">(必須)</span>カラーバー最大値</label>
-                        <input type="number" class="have-ul" required id="pow-max-input" value="-90" placeholder="カラーバー最大値" />
+                        <input type="number" class="have-ul" required id="pow-max-input" value="-90"
+                            placeholder="カラーバー最大値" />
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
                         <label>描画点の大きさ</label>
-                        
+
                         <select class="have-ul" required id="radius-selector">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -279,7 +299,7 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                             <option value="5000">5000</option>
                             <option value="20000">20000</option>
                         </select>
-                        
+
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
@@ -289,7 +309,7 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                     </div>
                     <div class="input-container">
                         <label>描画ステップ数(仮)</label>
-                        
+
                         <select class="have-ul" id="step-selector">
                             <option value="1" selected>1</option>
                             <option value="2">2</option>
@@ -304,12 +324,12 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                             <option value="100">100</option>
                             <option value="200">200</option>
                         </select>
-                        
+
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
                         <label>NaNの点(値の無い点)を描画</label>
-                        <input type="checkbox" class="have-ul" id="plot-nan-input" checked/>
+                        <input type="checkbox" class="have-ul" id="plot-nan-input" checked />
                         <label for="plot-nan-input">する</label>
                         <div class="form-underline"></div>
                     </div>
@@ -323,17 +343,17 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
 
                 <fieldset>
                     <legend>描画点の設定</legend>
-                    
+
                     <div class="input-container">
                         <label>円の塗りつぶしを</label>
                         <input type="checkbox" class="have-ul" id="fill-circle-input"" checked/>
-                        <label for="fill-circle-input"">する</label>
+                        <label for=" fill-circle-input"">する</label>
                         <div class="form-underline"></div>
                     </div>
-                    
+
                     <div class="input-container">
                         <label>枠線の幅</label>
-                        
+
                         <select class="have-ul" id="stroke-width-selector">
                             <option value="1" selected>1</option>
                             <option value="2">2</option>
@@ -348,13 +368,13 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                             <option value="100">100</option>
                             <option value="200">200</option>
                         </select>
-                        
+
                         <div class="form-underline"></div>
                     </div>
 
                     <div class="input-container">
                         <label>塗りつぶしの透明度</label>
-                        
+
                         <select class="have-ul" id="fill-opacity-selector">
                             <option value="0">0</option>
                             <option value="0.1">0.1</option>
@@ -368,13 +388,13 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                             <option value="0.9">0.9</option>
                             <option value="1.0" selected>1.0</option>
                         </select>
-                        
+
                         <div class="form-underline"></div>
                     </div>
 
                     <div class="input-container">
                         <label>枠線の透明度</label>
-                        
+
                         <select class="have-ul" id="stroke-opacity-selector">
                             <option value="0">0</option>
                             <option value="0.1">0.1</option>
@@ -388,7 +408,7 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                             <option value="0.9">0.9</option>
                             <option value="1.0" selected>1.0</option>
                         </select>
-    
+
                         <div class="form-underline"></div>
                     </div>
                 </fieldset>
@@ -400,7 +420,7 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
 
                     <div class="input-container">
                         <label>ヒートマップテーマの選択</label>
-                        
+
                         <select class="have-ul" required id="theme-selector">
                             <option value="red-blue">Red → Blue</option>
                             <option value="red">Red</option>
@@ -415,12 +435,12 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                             <option value="cool">cool</option>
                             <option value="jet" selected>jet</option>
                         </select>
-                        
+
                         <div class="form-underline"></div>
                     </div>
                     <div class="input-container">
                         <label>ヒートマップの向きは</label>
-                        <input type="checkbox" class="have-ul" id="reverse-heatmap-input"/>
+                        <input type="checkbox" class="have-ul" id="reverse-heatmap-input" />
                         <label for="reverse-heatmap-input">順方向</label>
                         <div class="form-underline"></div>
                     </div>
@@ -461,17 +481,18 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
                     </div>
                     <div class="input-container">
                         <label><span id="req-red"></span>信号ノイズ差([電力-ノイズ]がこの値以上だと描画される)</label>
-                        <input type="number" class="have-ul" required id="noise-diff-input" value="" placeholder="信号ノイズ差" disabled/>
+                        <input type="number" class="have-ul" required id="noise-diff-input" value=""
+                            placeholder="信号ノイズ差" disabled />
                         <div class="form-underline"></div>
                     </div>
                 </fieldset>
 
                 <div class="form-divider"></div>
-                
+
                 <div id="decide-button-container">
-                    <input type="button" id="decide-button" value="プロットする" disabled/>
+                    <input type="button" id="decide-button" value="プロットする" disabled />
                 </div>
-                
+
             </form>
             <div id="modal-close-button">
                 <a class="js-modal-close" href="">戻る</a>
@@ -480,305 +501,313 @@ function updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap) { // �
     </div>
 </body>
 <script>
-// file-inputボタンのイベント設定 : CSVの読み込み, header取得
-const file = $("#file-input");
-// var file = document.getElementById('file-input');
- 
-// HTML5 のFile APIに対応している場合
-if (window.File && window.FileReader && window.FileList && window.Blob) {
-    function loadLocalCsv(target) {
-        // ファイルデータ取得
-        var fileData = target.prop("files")[0];
-        // var fileData = e.target.files[0];
+    // file-inputボタンのイベント設定 : CSVの読み込み, header取得
+    const file = $("#file-input");
+    // var file = document.getElementById('file-input');
 
-        if ($("#file-input").val().length == 0) {
-            // セレクタを無効化
-            $(".index-selector").prop("disabled", false);
-            return;
-        }
+    // HTML5 のFile APIに対応している場合
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        function loadLocalCsv(target) {
+            // ファイルデータ取得
+            var fileData = target.prop("files")[0];
+            // var fileData = e.target.files[0];
 
-        // CSVファイルチェック
-        if(!fileData.name.match('.csv$')) {
-            alert('CSVファイルを選択してください');
-            return;
-        }
- 
-        // ファイル読み込み時の処理を書く
-        // ファイル読み込みに成功時、カンマ区切りを配列に加工
-        var reader = new FileReader();
-        reader.onload = function() {
-            var cols = reader.result.replace(/\r\n?/g,"\n").split("\n");
-            var data = [];
-            for (var i = 0; i < cols.length; i++) {
-                data[i] = cols[i].split(',');
+            if ($("#file-input").val().length == 0) {
+                // セレクタを無効化
+                $(".index-selector").prop("disabled", false);
+                return;
             }
 
-            // セレクタの中身を消す
-            $(".index-selector").empty();
-
-            // セレクタを有効化
-            $(".index-selector").prop("disabled", false).change();
-            
-            // セレクタの内容を追加 (CSVのカラム名)
-            $(".index-selector").append($("<option>").val("").text("利用するカラムを選択"));
-            for (let i=0; i<data[0].length; i++) {
-                $(".index-selector").append($("<option>").val(i).text(data[0][i]));
-                if (data[0][i] == "Latitude") {
-                    $("#lat-index-selector").val(i);
-                }
-                if (data[0][i] == "Longitude") {
-                    $("#lng-index-selector").val(i);
-                }
+            // CSVファイルチェック
+            if (!fileData.name.match('.csv$')) {
+                alert('CSVファイルを選択してください');
+                return;
             }
 
-            // 決定ボタンの挙動を加える
-            $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
-            $('#decide-button').on("click",function() {
-                $('#map-container svg g').empty();
+            // ファイル読み込み時の処理を書く
+            // ファイル読み込みに成功時、カンマ区切りを配列に加工
+            var reader = new FileReader();
+            reader.onload = function () {
+                var cols = reader.result.replace(/\r\n?/g, "\n").split("\n");
+                var data = [];
+                for (var i = 0; i < cols.length; i++) {
+                    data[i] = cols[i].split(',');
+                }
 
-                $('.js-modal-container').fadeOut();
+                // セレクタの中身を消す
+                $(".index-selector").empty();
 
-                const latIndex = parseInt($("#lat-index-selector").val());
-                const lngIndex = parseInt($("#lng-index-selector").val());
-                const powIndex = parseInt($("#pow-index-selector").val());
-                
-                const powMin = parseInt($("#pow-min-input").val());
-                const powMax = parseInt($("#pow-max-input").val());
+                // セレクタを有効化
+                $(".index-selector").prop("disabled", false).change();
 
-                const radius = parseInt($("#radius-selector").val());
-                const threshold = parseFloat($("#threshold-input").val());
-                const step = parseInt($("#step-selector").val());
-                const plotNan = $("#plot-nan-input").prop("checked");
+                // セレクタの内容を追加 (CSVのカラム名)
+                $(".index-selector").append($("<option>").val("").text("利用するカラムを選択"));
+                for (let i = 0; i < data[0].length; i++) {
+                    $(".index-selector").append($("<option>").val(i).text(data[0][i]));
+                    if (data[0][i] == "Latitude") {
+                        $("#lat-index-selector").val(i);
+                    }
+                    if (data[0][i] == "Longitude") {
+                        $("#lng-index-selector").val(i);
+                    }
+                }
 
-                const fillCircle = $("#fill-circle-input").prop("checked");
-                const strokeWidth = parseInt($("#stroke-width-selector").val());
-                const fillOpacity = parseFloat($("#fill-opacity-selector").val());
-                const strokeOpacity = parseFloat($("#stroke-opacity-selector").val());
-                
-                const interpolateTheme = $("#theme-selector").val();
-                const reverseHeatmap = $("#reverse-heatmap-input").prop("checked");
+                // 決定ボタンの挙動を加える
+                $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
+                $('#decide-button').on("click", function () {
+                    $('#map-container svg g').empty();
 
-                const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
-                const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
-                
-                // 点の描画
-                plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                    $('.js-modal-container').fadeOut();
 
-                // カラーバーの作製/更新
-                updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap);
+                    const latIndex = parseInt($("#lat-index-selector").val());
+                    const lngIndex = parseInt($("#lng-index-selector").val());
+                    const powIndex = parseInt($("#pow-index-selector").val());
 
-                // 初期位置ボタンの挙動追加
-                $('#reset-pos-button').off("click");
-                $('#reset-pos-button').on("click", function() {
+                    const powMin = parseInt($("#pow-min-input").val());
+                    const powMax = parseInt($("#pow-max-input").val());
+
+                    const radius = parseInt($("#radius-selector").val());
+                    const threshold = parseFloat($("#threshold-input").val());
+                    const step = parseInt($("#step-selector").val());
+                    const plotNan = $("#plot-nan-input").prop("checked");
+
+                    const fillCircle = $("#fill-circle-input").prop("checked");
+                    const strokeWidth = parseInt($("#stroke-width-selector").val());
+                    const fillOpacity = parseFloat($("#fill-opacity-selector").val());
+                    const strokeOpacity = parseFloat($("#stroke-opacity-selector").val());
+
+                    const interpolateTheme = $("#theme-selector").val();
+                    const reverseHeatmap = $("#reverse-heatmap-input").prop("checked");
+
+                    const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
+                    const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
+
+                    // 点の描画
+                    plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+
+                    // カラーバーの作製/更新
+                    updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap);
+
+                    // 初期位置ボタンの挙動追加
+                    $('#reset-pos-button').off("click");
+                    $('#reset-pos-button').on("click", function () {
+                        resetPos(data[1][latIndex], data[1][lngIndex]);
+                        return false;
+                    });
+
+                    // 保存ボタンの挙動変更
+                    const opacity = $("div#layer-opacity-slider-container>input[type=range]").val();
+                    $('#save-button').off("click");
+                    $('#save-button').on("click", function () {
+                        // 初期位置は描画位置に変更する
+                        outputHTML(data, powMin, powMax, radius, threshold, plotNan, opacity, interpolateTheme, reverseHeatmap, latIndex, lngIndex, powIndex, noiseIndex, noiseDiff, data[1][latIndex], data[1][lngIndex], 14);
+                        return false;
+                    });
+
                     resetPos(data[1][latIndex], data[1][lngIndex]);
+
+                    // カラーバーのコンテナ表示
+                    $("#colorbar-container").fadeTo(500, 1);
+
+                    updateTiles(0.5);
+
                     return false;
                 });
+            }
 
-                // 保存ボタンの挙動変更
-                $('#save-button').off("click");
-                $('#save-button').on("click", function() {
-                    // 初期位置は描画位置に変更する
-                    outputHTML(data, powMin, powMax, radius, threshold, plotNan, opacity, interpolateTheme, reverseHeatmap, latIndex, lngIndex, powIndex, noiseIndex, noiseDiff, data[1][latIndex], data[1][lngIndex], 14);
-                    return false;
-                });
+            // ファイル読み込みを実行
+            reader.readAsText(fileData);
+        };
+        file.on("change", function () {
+            if ($(this).prop('files').length == 0) {
+                $("#select-file-name").text("ファイルが選択されていません");
+            } else {
+                var file_name = $(this).prop('files')[0].name;
+                $("#select-file-name").text(file_name);
+            }
+            loadLocalCsv($(this));
+        });
+        file.on("click", function () {
+            $(this).val('');
+        });
 
-                resetPos(data[1][latIndex], data[1][lngIndex]);
-                
-                // カラーバーのコンテナ表示
-                $("#colorbar-container").fadeTo(500, 1);
-
-                updateTiles(0.5);
-
-                return false;
-            });
-        }
-
-        // ファイル読み込みを実行
-        reader.readAsText(fileData);
-    };
-    file.on("change", function(){
-        if ($(this).prop('files').length == 0) {
-            $("#select-file-name").text("ファイルが選択されていません");
-        } else {
-            var file_name = $(this).prop('files')[0].name;
-            $("#select-file-name").text(file_name);
-        }
-        loadLocalCsv($(this));
-    });
-    file.on("click", function(){
-        $(this).val('');
-    });
- 
-} else {
-    // file.style.display = 'none';
-    file.css("display", "none");
-    result.innerHTML = 'File APIに対応したブラウザでご確認ください';
-}
+    } else {
+        // file.style.display = 'none';
+        file.css("display", "none");
+        result.innerHTML = 'File APIに対応したブラウザでご確認ください';
+    }
 </script>
 <script>
-// ------ マップ描画関係 ------
-const initPos = [35.7, 139.75];
-const initOpacity = 1.0;
+    // ------ マップ描画関係 ------
+    const initPos = [35.7, 139.75];
+    const initOpacity = 1.0;
 
-// マップインスタンス生成
-let map = L.map(
-    "map-container",
-    {
-        center: initPos,
-        crs: L.CRS.EPSG3857,
-        zoom: 13,
-        zoomControl: true,
-        preferCanvas: false,
-    }
-);
+    // マップインスタンス生成
+    let map = L.map(
+        "map-container",
+        {
+            center: initPos,
+            crs: L.CRS.EPSG3857,
+            zoom: 13,
+            zoomControl: true,
+            preferCanvas: false,
+        }
+    );
 
-// タイルレイヤーの追加とレイヤーコントローラの追加
-let baseLayers = {};
-let overLayers = getTilesDict(initOpacity);
-let layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
+    // タイルレイヤーの追加とレイヤーコントローラの追加
+    let baseLayers = {};
+    let overLayers = getTilesDict(initOpacity);
+    let layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
 
-$(function(){
+    $(function () {
 
-    // 縮尺の表示
-    L.control.scale({
-        imperial: true,
-        metric: true
-    }).addTo(map);
-    
-    
-    // ズームコントローラの追加
-    map.zoomControl.setPosition("bottomright");
-    
-    // 初期位置ボタンの挙動追加
-    $('#reset-pos-button').off("click");
-    $('#reset-pos-button').on("click", function() {
-        resetPos(...initPos);
-        return false;
-    });
-    
-    // 初期タイル選択
-    $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
+        // 縮尺の表示
+        L.control.scale({
+            imperial: true,
+            metric: true
+        }).addTo(map);
 
-    // 透過スライダー位置決めとイベントの追加
-    updateLayerOpacitySliderPos();
-    const inner_width = $("div.leaflet-control-container>div.leaflet-top.leaflet-right a").width();
-    $("div#layer-opacity-slider-container").css("height", `${inner_width}px`);
-    $("div.leaflet-control-layers.leaflet-control").on("mouseenter", function(){
+
+        // ズームコントローラの追加
+        map.zoomControl.setPosition("bottomright");
+
+        // 初期位置ボタンの挙動追加
+        $('#reset-pos-button').off("click");
+        $('#reset-pos-button').on("click", function () {
+            resetPos(...initPos);
+            return false;
+        });
+
+        // 保存ボタンの挙動変更
+        $('#save-button').off("click");
+        $('#save-button').on("click", function () {
+            // 地図が更新されるのを防ぐため挿入.
+            return false;
+        });
+
+        // 初期タイル選択
+        $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
+
+        // 透過スライダー位置決めとイベントの追加
         updateLayerOpacitySliderPos();
+        const inner_width = $("div.leaflet-control-container>div.leaflet-top.leaflet-right a").width();
+        $("div#layer-opacity-slider-container").css("height", `${inner_width}px`);
+        $("div.leaflet-control-layers.leaflet-control").on("mouseenter", function () {
+            updateLayerOpacitySliderPos();
+        });
+        $("div.leaflet-control-layers.leaflet-control").on("mouseleave", function () {
+            updateLayerOpacitySliderPos();
+        });
+        $("div#layer-opacity-slider-container>input[type=range]").on("input", function () {
+            $(this).css("background-color", `rgba(20, 128, 230, ${$(this).val()})`);
+            updateTiles($(this).val());
+        });
     });
-    $("div.leaflet-control-layers.leaflet-control").on("mouseleave", function(){
-        updateLayerOpacitySliderPos();
-    });
-    $("div#layer-opacity-slider-container>input[type=range]").on("input", function(){
-        $(this).css("background-color", `rgba(20, 128, 230, ${$(this).val()})`);
-        updateTiles($(this).val());
-    });
-});
 
-// 透過スライダー位置更新
-function updateLayerOpacitySliderPos(){
-    const pos_top = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").offset().top;
-    const outer_height = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").outerHeight();
-    $("div#layer-opacity-slider-container").css("top", `${pos_top + outer_height + 10}px`);
-}
-
-// タイルの取得
-function getTilesDict(opacity) {
-    return {
-        "国土地理院:淡色地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", {
-            "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>", 
-            "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
-        }),
-        "国土地理院:標準地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", {
-            "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
-            "opacity": opacity
-        }),
-        "国土地理院:白地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png", {
-            "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>", 
-            "maxNativeZoom": 14, "maxZoom": 14, "minZoom": 6, "opacity": opacity
-        }),
-        "国土地理院:色別標高図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/relief/{z}/{x}/{y}.png", {
-            "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル. 海域部は海上保安庁海洋情報部の資料を使用して作成.</a>", 
-            "maxNativeZoom": 15, "maxZoom": 15, "minZoom": 6, "opacity": opacity
-        }),
-        "国土地理院:写真": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg", {
-            "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a><br>データソース：Landsat8画像（GSI,TSIC,GEO Grid/AIST）, Landsat8画像（courtesy of the U.S. Geological Survey）, 海底地形（GEBCO）",
-            "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 9, "opacity": opacity
-        }),
-        "国土地理院:陰影起伏図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", {
-            "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>", 
-            "maxNativeZoom": 16, "maxZoom": 16, "minZoom": 6, "opacity": opacity
-        }),
-        "OSM": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            "attribution": "&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors", 
-            "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
-        }),
-        "OSM-Toner": L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png", {
-            "attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", 
-            "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
-        })
-    }
-}
-
-
-// タイルの更新(選択中のタイルを引き継ぐ)
-function updateTiles(opacity) {
-    const layerNum = Object.keys(overLayers).length;
-    let checkedList = Array(layerNum);
-
-    // 現在選択中のレイヤを判別
-    for (let idx = 0; idx < layerNum; idx++) {
-        checkedList[idx] = $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(idx).prop('checked');
+    // 透過スライダー位置更新
+    function updateLayerOpacitySliderPos() {
+        const pos_top = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").offset().top;
+        const outer_height = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").outerHeight();
+        $("div#layer-opacity-slider-container").css("top", `${pos_top + outer_height + 10}px`);
     }
 
-    // 描画中のタイルレイヤーの削除
-    for (let key in overLayers) {
-        if (map.hasLayer(overLayers[key])) map.removeLayer(overLayers[key]);
+    // タイルの取得
+    function getTilesDict(opacity) {
+        return {
+            "国土地理院:淡色地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", {
+                "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
+            }),
+            "国土地理院:標準地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", {
+                "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+                "opacity": opacity
+            }),
+            "国土地理院:白地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png", {
+                "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+                "maxNativeZoom": 14, "maxZoom": 14, "minZoom": 6, "opacity": opacity
+            }),
+            "国土地理院:色別標高図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/relief/{z}/{x}/{y}.png", {
+                "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル. 海域部は海上保安庁海洋情報部の資料を使用して作成.</a>",
+                "maxNativeZoom": 15, "maxZoom": 15, "minZoom": 6, "opacity": opacity
+            }),
+            "国土地理院:写真": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg", {
+                "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a><br>データソース：Landsat8画像（GSI,TSIC,GEO Grid/AIST）, Landsat8画像（courtesy of the U.S. Geological Survey）, 海底地形（GEBCO）",
+                "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 9, "opacity": opacity
+            }),
+            "国土地理院:陰影起伏図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", {
+                "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+                "maxNativeZoom": 16, "maxZoom": 16, "minZoom": 6, "opacity": opacity
+            }),
+            "OSM": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                "attribution": "&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors",
+                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
+            }),
+            "OSM-Toner": L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png", {
+                "attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.",
+                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
+            })
+        }
     }
-    
-    // レイヤーコントローラーの削除と更新
-    layersControl.remove();
-    overLayers = getTilesDict(opacity);
-    layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
 
-    // レイヤを選択する
-    for (let idx = 0; idx < layerNum; idx++) {
-        if (checkedList[idx]) $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(idx).trigger("click");
-    }
-}
 
-// 円のプロットのための関数
-function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
-    for (let i=1; i<data.length; i+=step) {
-        if (data[i].length < 3) {
-            continue;
+    // タイルの更新(選択中のタイルを引き継ぐ)
+    function updateTiles(opacity) {
+        const layerNum = Object.keys(overLayers).length;
+        let checkedList = Array(layerNum);
+
+        // 現在選択中のレイヤを判別
+        for (let idx = 0; idx < layerNum; idx++) {
+            checkedList[idx] = $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(idx).prop('checked');
         }
 
-        // 点を描画するかどうかのチェック
-        if (data[i][powIndex] < threshold) { // thresholdによるチェック (ちなみにthreshold is NaN なら Falseになる)
-            continue;
-        } else if ( !plotNan && isNaN(data[i][powIndex]) ) {
-            continue;
-        } else if ( !plotNan && (data[i][powIndex].length==0) ) {
-            continue;
+        // 描画中のタイルレイヤーの削除
+        for (let key in overLayers) {
+            if (map.hasLayer(overLayers[key])) map.removeLayer(overLayers[key]);
         }
 
-        const lat = parseFloat(data[i][latIndex]);
-        const lng = parseFloat(data[i][lngIndex]);
-        const pow = parseFloat(data[i][powIndex]);
-        
-        // ノイズとの差のチェック, index=-1の時, チェックしない.
-        // 電力の方がNaNのときは描画する
-        if (noiseIndex >= 0) {
-            const noise = parseFloat(data[i][noiseIndex]);
-            if ((pow - noise) < noiseDiff) {
+        // レイヤーコントローラーの削除と更新
+        layersControl.remove();
+        overLayers = getTilesDict(opacity);
+        layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
+
+        // レイヤを選択する
+        for (let idx = 0; idx < layerNum; idx++) {
+            if (checkedList[idx]) $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(idx).trigger("click");
+        }
+    }
+
+    // 円のプロットのための関数
+    function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
+        for (let i = 1; i < data.length; i += step) {
+            if (data[i].length < 3) {
                 continue;
             }
-        }
 
-        const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
-        
-        c = L.circle(
+            // 点を描画するかどうかのチェック
+            if (data[i][powIndex] < threshold) { // thresholdによるチェック (ちなみにthreshold is NaN なら Falseになる)
+                continue;
+            } else if (!plotNan && isNaN(data[i][powIndex])) {
+                continue;
+            } else if (!plotNan && (data[i][powIndex].length == 0)) {
+                continue;
+            }
+
+            const lat = parseFloat(data[i][latIndex]);
+            const lng = parseFloat(data[i][lngIndex]);
+            const pow = parseFloat(data[i][powIndex]);
+
+            // ノイズとの差のチェック, index=-1の時, チェックしない.
+            // 電力の方がNaNのときは描画する
+            if (noiseIndex >= 0) {
+                const noise = parseFloat(data[i][noiseIndex]);
+                if ((pow - noise) < noiseDiff) {
+                    continue;
+                }
+            }
+
+            const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
+
+            c = L.circle(
                 [lat, lng],
                 {
                     "bubblingMouseEvents": true,
@@ -798,123 +827,123 @@ function plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax
                 }
             ).addTo(map);
 
-        c.bindPopup(`緯度 : ${lat}<br>経度 : ${lng}<br>値 : ${pow}`);
-        c.on("mouseover", function(e) {
-            this.openPopup();
-        });
-        c.on("mouseout", function(e) {
-            this.closePopup();
-        });
+            c.bindPopup(`緯度 : ${lat}<br>経度 : ${lng}<br>値 : ${pow}`);
+            c.on("mouseover", function (e) {
+                this.openPopup();
+            });
+            c.on("mouseout", function (e) {
+                this.closePopup();
+            });
+        }
+    };
+
+    function resetPos(lat, lng) {
+        map.setView([lat, lng]);
     }
-};
-
-function resetPos(lat, lng) {
-    map.setView([lat, lng]);
-}
 </script>
 <script>
-// モーダルの表示
-$(function(){
-    $('.js-modal-open').on('click',function(){
-        $('.js-modal-container').fadeIn();
-        return false;
+    // モーダルの表示
+    $(function () {
+        $('.js-modal-open').on('click', function () {
+            $('.js-modal-container').fadeIn();
+            return false;
+        });
+        $('.js-modal-close').on('click', function () {
+            $('.js-modal-container').fadeOut();
+            return false;
+        });
     });
-    $('.js-modal-close').on('click',function(){
-        $('.js-modal-container').fadeOut();
-        return false;
-    });
-});
 </script>
 <script>
-// 各入力項目のチェック
-function checkRequiredElementFilled() {
-    let filled = true;
-    $("#plot-opt-form input:required, #plot-opt-form select:required").each(function(i, e) {
-        // console.log($(this).prop("id"), $(this).prop("disabled"));
-        if ($(e).val() == "" || $(e).val() == null) {
-            if (!$(e).prop("disabled")) {
-                filled = false;
+    // 各入力項目のチェック
+    function checkRequiredElementFilled() {
+        let filled = true;
+        $("#plot-opt-form input:required, #plot-opt-form select:required").each(function (i, e) {
+            // console.log($(this).prop("id"), $(this).prop("disabled"));
+            if ($(e).val() == "" || $(e).val() == null) {
+                if (!$(e).prop("disabled")) {
+                    filled = false;
+                }
             }
-        }
-    });
-    return filled;
-};
-$(function(){
-    // 項目内容に応じて, 決定ボタンを表示する
-    $("#plot-opt-form input:required, #plot-opt-form select:required").on("change", function() {
-        if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
-            $("#decide-button").prop("disabled", true).change();
-            return;
-        }
-        if (!checkRequiredElementFilled()) {
-            $("#decide-button").prop("disabled", true).change();
-            return;
-        }
-        $("#decide-button").prop("disabled", false).change();
-    });
+        });
+        return filled;
+    };
+    $(function () {
+        // 項目内容に応じて, 決定ボタンを表示する
+        $("#plot-opt-form input:required, #plot-opt-form select:required").on("change", function () {
+            if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
+                $("#decide-button").prop("disabled", true).change();
+                return;
+            }
+            if (!checkRequiredElementFilled()) {
+                $("#decide-button").prop("disabled", true).change();
+                return;
+            }
+            $("#decide-button").prop("disabled", false).change();
+        });
 
-    // 大小のチェック
-    $("#pow-min-input").on("change", function() {
-        if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
-            $("#pow-max-input").val(parseInt($(this).val()) + 100);
-        }
-    });
-    $("#pow-max-input").on("change", function() {
-        if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
-            $("#pow-min-input").val(parseInt($(this).val()) - 100);
-        }
-    });
+        // 大小のチェック
+        $("#pow-min-input").on("change", function () {
+            if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
+                $("#pow-max-input").val(parseInt($(this).val()) + 100);
+            }
+        });
+        $("#pow-max-input").on("change", function () {
+            if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
+                $("#pow-min-input").val(parseInt($(this).val()) - 100);
+            }
+        });
 
-    // ノイズのカラムの選択時の処理
-    $("#noise-index-selector").on("change", function() {
-        if ($(this).val() == "" || $(this).val() == null) {
-            $("#noise-diff-input").prop("disabled", true).change();
-            $("#noise-diff-input").prev().children("span").text("");
-        } else {
-            $("#noise-diff-input").prop("disabled", false).change();
-            $("#noise-diff-input").prev().children("span").text("(必須)");
-        }
-    });
+        // ノイズのカラムの選択時の処理
+        $("#noise-index-selector").on("change", function () {
+            if ($(this).val() == "" || $(this).val() == null) {
+                $("#noise-diff-input").prop("disabled", true).change();
+                $("#noise-diff-input").prev().children("span").text("");
+            } else {
+                $("#noise-diff-input").prop("disabled", false).change();
+                $("#noise-diff-input").prev().children("span").text("(必須)");
+            }
+        });
 
-    // 入力フォーム部分の下線部とか文字装飾アニメーション
-    $('.input-container>.have-ul').focus(function(){
-        $(this).prev().css({'color': '#0261c0'});
-        $(this).next().addClass("form-underline-focus");
-    }).blur(function(){
-        $(this).prev().css({'color': 'rgb(39, 39, 39)'});
-        $(this).next().removeClass("form-underline-focus");
-    });
+        // 入力フォーム部分の下線部とか文字装飾アニメーション
+        $('.input-container>.have-ul').focus(function () {
+            $(this).prev().css({ 'color': '#0261c0' });
+            $(this).next().addClass("form-underline-focus");
+        }).blur(function () {
+            $(this).prev().css({ 'color': 'rgb(39, 39, 39)' });
+            $(this).next().removeClass("form-underline-focus");
+        });
 
-    // マップの透明度に合わせて, レンジバーの透過
-    $("#opacity-input").on("input", function() {
-        $(this).css("background-color", `rgba(21, 177, 224, ${$(this).val()})`);
-    });
+        // マップの透明度に合わせて, レンジバーの透過
+        $("#opacity-input").on("input", function () {
+            $(this).css("background-color", `rgba(21, 177, 224, ${$(this).val()})`);
+        });
 
-    // モーダルのNaNに対するチェックボックスの変更
-    $("#plot-nan-input").on("change", function() {
-        if ($(this).prop("checked")) {
-            $(this).next().text("する");
-        } else {
-            $(this).next().text("しない");
-        }
-    });
+        // モーダルのNaNに対するチェックボックスの変更
+        $("#plot-nan-input").on("change", function () {
+            if ($(this).prop("checked")) {
+                $(this).next().text("する");
+            } else {
+                $(this).next().text("しない");
+            }
+        });
 
-    // モーダルの円の塗りつぶしに対するチェックボックスの変更
-    $("#fill-circle-input").on("change", function() {
-        if ($(this).prop("checked")) {
-            $(this).next().text("する");
-        } else {
-            $(this).next().text("しない");
-        }
-    });
+        // モーダルの円の塗りつぶしに対するチェックボックスの変更
+        $("#fill-circle-input").on("change", function () {
+            if ($(this).prop("checked")) {
+                $(this).next().text("する");
+            } else {
+                $(this).next().text("しない");
+            }
+        });
 
-    // モーダルの「ヒートマップの向き」に対するチェックボックスの変更
-    $("#reverse-heatmap-input").on("change", function() {
-        if ($(this).prop("checked")) {
-            $(this).next().text("逆方向");
-        } else {
-            $(this).next().text("順方向");
-        }
+        // モーダルの「ヒートマップの向き」に対するチェックボックスの変更
+        $("#reverse-heatmap-input").on("change", function () {
+            if ($(this).prop("checked")) {
+                $(this).next().text("逆方向");
+            } else {
+                $(this).next().text("順方向");
+            }
+        });
     });
-});
 </script>
