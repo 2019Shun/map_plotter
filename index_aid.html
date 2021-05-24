@@ -596,10 +596,10 @@
                     });
 
                     // 保存ボタンの挙動変更
+                    const opacity = $("div#layer-opacity-slider-container>input[type=range]").val();
                     $('#save-button').off("click");
                     $('#save-button').on("click", function () {
                         // 初期位置は描画位置に変更する
-                        console.log("hoge");
                         outputHTML(data, powMin, powMax, radius, threshold, plotNan, opacity, interpolateTheme, reverseHeatmap, latIndex, lngIndex, powIndex, noiseIndex, noiseDiff, data[1][latIndex], data[1][lngIndex], 14);
                         return false;
                     });
