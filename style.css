@@ -145,8 +145,20 @@
 #outer-file-input-container {
     text-align: left;
     background-color: rgba(150, 150, 150, 0.1);
-    cursor: pointer;
+}
+#file-input-drop-box {
+    border: rgba(46, 120, 194, 0.5) 2px dashed;
 
+    margin: 0.5rem 0.5rem 0;
+    padding: 4rem 0;
+
+    cursor: default;
+}
+#file-input-drop-box div {
+    text-align: center;
+    color: rgb(185, 184, 184);
+    font-weight: bolder;
+    font-size: 1.1rem;
 }
 #file-input-container {
     display: inline-block;
@@ -169,7 +181,9 @@
 #file-input-container:hover {
     box-shadow: 0 4px 4px rgba(0,0,0,0.2);
     cursor: pointer;
-
+}
+#file-upload-button {
+    cursor: pointer;
 }
 #file-input {
     opacity: 0;
@@ -178,7 +192,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    cursor: pointer;
+    cursor: pointer;    
+}
+#file-input input {
+    display: none;
+}
+input[type=file]::file-selector-button,
+input[type=file]::-webkit-file-upload-button {
+    display: none;
 }
 /* ----- 各パラメータ入力のCSS ----- */
 .input-container select:disabled {
