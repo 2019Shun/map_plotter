@@ -145,6 +145,8 @@
 #outer-file-input-container {
     text-align: left;
     background-color: rgba(150, 150, 150, 0.1);
+    display: block;
+    position: relative;
 }
 #file-input-drop-box {
     border: rgba(46, 120, 194, 0.5) 2px dashed;
@@ -152,11 +154,20 @@
     margin: 0.5rem 0.5rem 0;
     padding: 4rem 0;
 
+    color: rgb(185, 184, 184);
+    
     cursor: default;
+
+    /* transition-property: outline-style 400ms linear; */
+}
+#file-input-drop-box.drag-enter {
+    transition: 300ms;
+    
+    color: rgb(109, 109, 109);
+    background-color: rgba(76, 157, 238, 0.096);;
 }
 #file-input-drop-box div {
     text-align: center;
-    color: rgb(185, 184, 184);
     font-weight: bolder;
     font-size: 1.1rem;
 }
@@ -182,9 +193,6 @@
     box-shadow: 0 4px 4px rgba(0,0,0,0.2);
     cursor: pointer;
 }
-#file-upload-button {
-    cursor: pointer;
-}
 #file-input {
     opacity: 0;
     position: absolute;
@@ -193,9 +201,6 @@
     width: 100%;
     height: 100%;
     cursor: pointer;    
-}
-#file-input input {
-    display: none;
 }
 input[type=file]::file-selector-button,
 input[type=file]::-webkit-file-upload-button {

@@ -255,12 +255,12 @@
         <div class="modal-content">
             <form id="plot-opt-form">
                 <div id="outer-file-input-container">
+                    <input type="file" id="file-input" />
                     <div id="file-input-drop-box">
                         <div>ファイルをここにドロップ</div>
                     </div>
                     <span class="" id="file-input-container">
                         ファイルを選択
-                        <input type="file" id="file-input" />
                     </span>
                     <span id="select-file-name">ファイルが選択されていません</span>
                 </div>
@@ -873,6 +873,16 @@
         return filled;
     };
     $(function () {
+        // ------ 動作に対するアクション決定系
+        // ファイルをドラッグオーバーしたときの処理
+        $("#file-input").on("dragenter", function (e) {
+            // e.preventDefault();
+            $("#file-input-drop-box").addClass("drag-enter")
+        });
+        $("#file-input").on("dragleave drop", function (e) {
+            // e.preventDefault();
+            $("#file-input-drop-box").removeClass("drag-enter")
+        });
         // 項目内容に応じて, 決定ボタンを表示する
         $("#plot-opt-form input:required, #plot-opt-form select:required").on("change", function () {
             if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
