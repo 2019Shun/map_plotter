@@ -537,13 +537,13 @@
                     data[i] = cols[i].split(',');
                 }
 
-                // セレクタの中身を消す
+                // 「カラムの選択」: セレクタの中身を消す
                 $(".index-selector").empty();
 
-                // セレクタを有効化
+                // 「カラムの選択」: セレクタを有効化
                 $(".index-selector").prop("disabled", false).change();
 
-                // セレクタの内容を追加 (CSVのカラム名)
+                // 「カラムの選択」: セレクタの内容を追加 (CSVのカラム名)
                 $(".index-selector").append($("<option>").val("").text("利用するカラムを選択"));
                 for (let i = 0; i < data[0].length; i++) {
                     $(".index-selector").append($("<option>").val(i).text(data[0][i]));
