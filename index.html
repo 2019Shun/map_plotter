@@ -559,11 +559,6 @@
                     }
                 }
 
-                // 「描画の設定」: 最小値・最大値のセットボタンを有効化＆挙動追加
-                $(".action-button-container>a").removeClass("disable").addClass("enable"); // ボタンの有効化
-                // (最小値と最大値を算出, 保持しておく)
-                // ボタンが押されたら最小値と最大値をセットする処理を付与
-
                 // 決定ボタンの挙動を加える
                 $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
                 $('#decide-button').on("click", function () {
@@ -761,7 +756,6 @@
         }
     }
 
-
     // タイルの更新(選択中のタイルを引き継ぐ)
     function updateTiles(opacity) {
         const layerNum = Object.keys(overLayers).length;
@@ -892,6 +886,19 @@
             // e.preventDefault();
             $("#file-input-drop-box").removeClass("drag-enter")
         });
+        // 電力の列が入力された際に「描画の設定」: 最小値・最大値のセットボタンを有効化＆挙動追加
+        $("#pow-index-selector").on("change", function () {
+            if ($(this).val() != "" && $(this).val() != null) {
+                if (!$(this).prop("disabled")) {
+                    $("#calc-minmax").removeClass("disable").addClass("enable");
+                    $("#calc-minmax").on("click", function () {
+                        $("#pow-min-input").val(0)
+                        $("#pow-max-input").val(999)
+                    });
+                }
+            }
+        });
+
         // 項目内容に応じて, 決定ボタンを表示する
         $("#plot-opt-form input:required, #plot-opt-form select:required").on("change", function () {
             if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
