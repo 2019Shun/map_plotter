@@ -538,7 +538,10 @@
                 var cols = reader.result.replace(/\r\n?/g, "\n").split("\n");
                 var data = [];
                 for (var i = 0; i < cols.length; i++) {
-                    data[i] = cols[i].split(',');
+                    const vals = cols[i].split(',');
+                    if (vals.length >= 3) {
+                        data[i] = vals;
+                    }
                 }
 
                 // 「カラムの選択」: セレクタの中身を消す
@@ -558,6 +561,15 @@
                         $("#lng-index-selector").val(i);
                     }
                 }
+
+                // 「描画の設定」: 最小値と最大値を算出するボタンの挙動
+                $('#calc-minmax').on('click', function () {
+                    const powIndex = parseInt($("#pow-index-selector").val());
+                    let [min_v, max_v] = getMinMax(data, powIndex);
+                    $("#pow-min-input").val(min_v)
+                    $("#pow-max-input").val(max_v)
+                    return false;
+                });
 
                 // 決定ボタンの挙動を加える
                 $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
@@ -846,6 +858,13 @@
     function resetPos(lat, lng) {
         map.setView([lat, lng]);
     }
+
+    // データのうち, 電力列における最小・最大値を取得する
+    function getMinMax(data, powIndex) {
+        let data_T = data[0].map((_, c) => data.map(r => r[c]));
+        let parsed_arr = data_T[powIndex].flatMap((v, i) => i === 0 ? [] : parseFloat(v));
+        return [Math.min.apply(null, parsed_arr), Math.max.apply(null, parsed_arr)]
+    }
 </script>
 <script>
     // 各入力項目のチェック
@@ -872,11 +891,6 @@
             $('.js-modal-container').fadeOut();
             return false;
         });
-        // 「描画の設定」: 最小値と最大値を算出するボタンの挙動
-        $('#calc-minmax').on('click', function () {
-            // ファイル決定時にクリック時の動作内容を決定する 
-            return false;
-        });
         // ファイルをドラッグオーバーしたときの処理
         $("#file-input").on("dragenter", function (e) {
             // e.preventDefault();
@@ -886,15 +900,12 @@
             // e.preventDefault();
             $("#file-input-drop-box").removeClass("drag-enter")
         });
+
         // 電力の列が入力された際に「描画の設定」: 最小値・最大値のセットボタンを有効化＆挙動追加
         $("#pow-index-selector").on("change", function () {
             if ($(this).val() != "" && $(this).val() != null) {
                 if (!$(this).prop("disabled")) {
                     $("#calc-minmax").removeClass("disable").addClass("enable");
-                    $("#calc-minmax").on("click", function () {
-                        $("#pow-min-input").val(0)
-                        $("#pow-max-input").val(999)
-                    });
                 }
             }
         });
