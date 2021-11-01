@@ -233,6 +233,53 @@ input[type=file]::-webkit-file-upload-button {
     position: relative; /*.form-underline::beforeの親要素*/
     border-top: 2px solid #c2c2c2; /*text3の下線*/
 }
+/* ----- アクションボタンのデザイン ----- */
+.action-button-container {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+.action-button-container>a {
+    display: inline-block;
+
+    width: 70%;
+
+    margin: 0.9rem 0.3rem 0.7rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+
+    font-size: 1.2rem;
+
+    color: rgb(255, 255, 255);
+    background-color: rgb(53, 144, 235);
+    
+    transition: 300ms;
+}
+.action-button-container>a.enable:hover {
+    color: rgb(255, 255, 255);
+    background-color: rgb(37, 119, 201);
+}
+.action-button-container>a.disable {
+    display: inline-block;
+
+    width: 70%;
+
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+
+    font-size: 1.2rem;
+
+    color: rgb(255, 255, 255);
+    background-color: rgba(53, 144, 235, 0.377);
+    
+    transition: 300ms;
+
+    cursor: none;
+}
+.action-button-container>a.disable:hover {
+    /* color: rgb(255, 255, 255);
+    background-color: rgb(37, 119, 201); */
+}
 /* ----- フォームのアニメーション用 ----- */
 .form-underline::before,
 .form-underline::after{

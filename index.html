@@ -292,6 +292,10 @@
                 <fieldset>
                     <legend>描画の設定</legend>
 
+                    <div class="action-button-container">
+                        <a href="" class="disable" id="calc-minmax">最小値と最大値を算出</a>
+                    </div>
+
                     <div class="input-container">
                         <label><span id="req-red">(必須)</span>カラーバー最小値</label>
                         <input type="number" class="have-ul" required id="pow-min-input" value="-130"
@@ -554,6 +558,11 @@
                         $("#lng-index-selector").val(i);
                     }
                 }
+
+                // 「描画の設定」: 最小値・最大値のセットボタンを有効化＆挙動追加
+                $(".action-button-container>a").removeClass("disable").addClass("enable"); // ボタンの有効化
+                // (最小値と最大値を算出, 保持しておく)
+                // ボタンが押されたら最小値と最大値をセットする処理を付与
 
                 // 決定ボタンの挙動を加える
                 $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
@@ -845,19 +854,6 @@
     }
 </script>
 <script>
-    // モーダルの表示
-    $(function () {
-        $('.js-modal-open').on('click', function () {
-            $('.js-modal-container').fadeIn();
-            return false;
-        });
-        $('.js-modal-close').on('click', function () {
-            $('.js-modal-container').fadeOut();
-            return false;
-        });
-    });
-</script>
-<script>
     // 各入力項目のチェック
     function checkRequiredElementFilled() {
         let filled = true;
@@ -873,6 +869,20 @@
     };
     $(function () {
         // ------ 動作に対するアクション決定系
+        // モーダルウィンドウ関係
+        $('.js-modal-open').on('click', function () {
+            $('.js-modal-container').fadeIn();
+            return false;
+        });
+        $('.js-modal-close').on('click', function () {
+            $('.js-modal-container').fadeOut();
+            return false;
+        });
+        // 「描画の設定」: 最小値と最大値を算出するボタンの挙動
+        $('#calc-minmax').on('click', function () {
+            // ファイル決定時にクリック時の動作内容を決定する 
+            return false;
+        });
         // ファイルをドラッグオーバーしたときの処理
         $("#file-input").on("dragenter", function (e) {
             // e.preventDefault();
