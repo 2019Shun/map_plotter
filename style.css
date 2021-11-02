@@ -87,32 +87,48 @@
 
     transition: .3s;
 }
+#opt-button-container>a[target="_blank"]::after {
+    font-family: "Font Awesome 5 Free";
+    content: '\f360';
+    font-size: 105%;
+    font-weight: 900;
+    margin: 0 3px;
+}
 
 /* 各ボタンの配色 */
-#opt-button-container>a:nth-child(3n+1) {
+#opt-button-container>a:nth-child(1) {
     background-color: rgb(20, 128, 230);
-    box-shadow: 0.35rem 0.35rem 0.1rem rgb(20, 97, 170);
+    box-shadow: 0.25rem 0.35rem 0.1rem rgb(20, 97, 170);
 }
-#opt-button-container>a:nth-child(3n+1):hover {
+#opt-button-container>a:nth-child(1):hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
     box-shadow: 0.2rem 0.2rem 0.1rem rgb(13, 81, 144);
 }
-#opt-button-container>a:nth-child(3n+2) {
-    background-color: rgb(230, 132, 20);
-    box-shadow: 0.35rem 0.35rem 0.1rem rgb(170, 113, 20);
+#opt-button-container>a:nth-child(2) {
+    background-color: rgb(235, 113, 14);
+    box-shadow: 0.25rem 0.35rem 0.1rem rgb(179, 108, 16);
 }
-#opt-button-container>a:nth-child(3n+2):hover {
+#opt-button-container>a:nth-child(2):hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
     box-shadow: 0.2rem 0.2rem 0.1rem rgb(144, 98, 13);
 }
-#opt-button-container>a:nth-child(3n) {
-    background-color: rgb(17, 199, 63);
-    box-shadow: 0.35rem 0.35rem 0.1rem rgb(14, 149, 43);
+#opt-button-container>a:nth-child(3) {
+    background-color: rgb(7, 207, 57);
+    box-shadow: 0.25rem 0.35rem 0.1rem rgb(14, 149, 43);
 }
-#opt-button-container>a:nth-child(3n):hover {
+#opt-button-container>a:nth-child(3):hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
     box-shadow: 0.2rem 0.2rem 0.1rem rgb(7, 102, 38);
 }
+#opt-button-container>a:nth-child(4) {
+    background-color: rgb(146, 146, 146);
+    box-shadow: 0.25rem 0.35rem 0.1rem rgb(119, 119, 119);
+}
+#opt-button-container>a:nth-child(4):hover {
+    text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
+    box-shadow: 0.2rem 0.2rem 0.1rem rgb(78, 78, 78);
+}
+
 
 
 
