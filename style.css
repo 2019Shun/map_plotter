@@ -135,8 +135,6 @@
 
 
 
-
-
 /* ----- モーダルウィンドウ ----- */
 .modal-container{
     display: none;
@@ -369,7 +367,10 @@ input[type=file]::-webkit-file-upload-button {
 #modal-close-button>a:visited {
     color: rgb(244, 244, 244);
 }
-/* ----- 決定ボタンの装飾 ----- */
+
+
+
+/* ----- 移動用モーダルウィンドウの決定ボタンの装飾 ----- */
 #decide-button-container {
     margin-top: 2rem;
     text-align: center;
@@ -501,6 +502,58 @@ div.modal-content fieldset>legend {
     font-size: 1.3rem;
     font-weight: 700;
 }
+
+
+
+/* ----- 移動用のモーダルウィンドウ ----- */
+#now-pos .name {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+#now-pos .lat .name {
+    color: rgb(20, 128, 230);
+}
+#now-pos .lng .name {
+    color: rgb(235, 113, 14);
+}
+#now-pos .value {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: .5rem;
+    padding: .1rem .8rem;
+}
+#now-pos .lat .value {
+    background-color: rgb(20, 128, 230);
+}
+#now-pos .lng .value {
+    background-color: rgb(235, 113, 14);
+}
+.move-modal-container .decide-move-button {
+    margin-top: 1rem;
+    text-align: center;
+    width: 100%;
+}
+.move-modal-container .decide-move-button a {
+    display: inline-block;
+    padding: .5rem 0;
+    width: 60%;
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    background-color: rgba(53, 144, 235, 0.85);
+    color: rgb(244, 244, 244);
+
+    font-size: 1.2rem;
+    font-weight: 700;
+
+    transition: .3s;
+}
+.move-modal-container .decide-move-button a:hover {
+    background-color: rgb(20, 128, 230);
+}
+
+
 
 /* ----- 観測点のポップアップ ----- */
 .leaflet-popup-content-wrapper {

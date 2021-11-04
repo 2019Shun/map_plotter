@@ -245,8 +245,8 @@
 
     <!-- プロット関連のモーダルウィンドウの表示ボタン -->
     <div id="opt-button-container">
-        <a class="js-modal-open" href="">Plot</a>
-        <a id="reset-pos-button" href="">Move</a>
+        <a class="plot-modal-open" href="">Plot</a>
+        <a class="move-modal-open" href="">Move</a>
         <a id="save-button" href="">Save</a>
         <a id="save-button" target="_blank"
             href="https://www.notion.so/Map-Plotter-19aebd0ef33647f0ad13f47ac8133b9b">Usage</a>
@@ -259,8 +259,9 @@
 
     <div id="colorbar-container"></div>
 
-    <div class="modal-container js-modal-container">
-        <div class="modal-bg js-modal-close"></div>
+    <!-- 描画のモーダルウィンドウ -->
+    <div class="modal-container plot-modal-container">
+        <div class="modal-bg plot-modal-close"></div>
         <div class="modal-content">
             <form id="plot-opt-form">
                 <div id="outer-file-input-container">
@@ -513,7 +514,59 @@
 
             </form>
             <div id="modal-close-button">
-                <a class="js-modal-close" href="">戻る</a>
+                <a class="plot-modal-close" href="">閉じる</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移動のモーダルウィンドウ -->
+    <div class="modal-container move-modal-container">
+        <div class="modal-bg move-modal-close"></div>
+        <div class="modal-content">
+            <div id="now-pos">
+                <div class="lat">
+                    <div class="name">緯度(Latitude)</div>
+                    <div class="value">XXX</div>
+                </div>
+                <div class="lng">
+                    <div class="name">経度(Longitude)</div>
+                    <div class="value">YYY</div>
+                </div>
+            </div>
+
+            <div class="form-divider"></div>
+
+
+            <fieldset>
+                <legend>指定した位置へ移動</legend>
+
+                <div class="input-container">
+                    <label>緯度</label>
+                    <input type="number" class="have-ul" id="lat-input" value="" placeholder="緯度" />
+                    <div class="form-underline"></div>
+                </div>
+                <div class="input-container">
+                    <label>経度</label>
+                    <input type="number" class="have-ul" id="lng-input" value="" placeholder="経度" />
+                    <div class="form-underline"></div>
+                </div>
+                <div class="decide-move-button">
+                    <a id="move-specified-pos" href="">移動</a>
+                </div>
+            </fieldset>
+
+            <div class="form-divider"></div>
+
+            <fieldset>
+                <legend>描画初期位置へ移動</legend>
+
+                <div class="decide-move-button">
+                    <a id="reset-pos-button" href="">移動</a>
+                </div>
+            </fieldset>
+
+            <div id="modal-close-button">
+                <a class="move-modal-close" href="">閉じる</a>
             </div>
         </div>
     </div>
@@ -587,7 +640,7 @@
                 $('#decide-button').on("click", function () {
                     $('#map-container svg g').empty();
 
-                    $('.js-modal-container').fadeOut();
+                    $('.plot-modal-container').fadeOut();
 
                     const latIndex = parseInt($("#lat-index-selector").val());
                     const lngIndex = parseInt($("#lng-index-selector").val());
@@ -697,6 +750,8 @@
             metric: true
         }).addTo(map);
 
+        // 初期位置の緯度経度を記述
+        describeNowLatLng(map.getCenter());
 
         // ズームコントローラの追加
         map.zoomControl.setPosition("bottomright");
@@ -732,7 +787,18 @@
             $(this).css("background-color", `rgba(20, 128, 230, ${$(this).val()})`);
             updateTiles($(this).val());
         });
+
+        // ------ マップイベントに対する
+        map.on('moveend', function (e) {
+            describeNowLatLng(this.getCenter());
+        });
     });
+
+    // 現在の緯度経度を記述
+    function describeNowLatLng(center) {
+        $("#now-pos .lat .value").text(center.lat);
+        $("#now-pos .lng .value").text(center.lng);
+    }
 
     // 透過スライダー位置更新
     function updateLayerOpacitySliderPos() {
@@ -867,7 +933,11 @@
     };
 
     function resetPos(lat, lng) {
-        map.setView([lat, lng]);
+        if (lat !== "" && lng !== "") {
+            if ((-90 <= lat <= 90) && (-180 <= lng <= 180)) {
+                map.setView([lat, lng]);
+            }
+        }
     }
 
     // データのうち, 電力列における最小・最大値を取得する
@@ -893,15 +963,33 @@
     };
     $(function () {
         // ------ 動作に対するアクション決定系
-        // モーダルウィンドウ関係
-        $('.js-modal-open').on('click', function () {
-            $('.js-modal-container').fadeIn();
+        // 移動のモーダルウィンドウ関係
+        $("a#move-specified-pos").on("click", function () {
+            resetPos(
+                $("input#lat-input").val(),
+                $("input#lng-input").val()
+            );
+            return false;
+        })
+        // プロットのモーダルウィンドウ関係
+        $('.plot-modal-open').on('click', function () {
+            $('.plot-modal-container').fadeIn();
             return false;
         });
-        $('.js-modal-close').on('click', function () {
-            $('.js-modal-container').fadeOut();
+        $('.plot-modal-close').on('click', function () {
+            $('.plot-modal-container').fadeOut();
             return false;
         });
+        // 移動のモーダルウィンドウ関係
+        $('.move-modal-open').on('click', function () {
+            $('.move-modal-container').fadeIn();
+            return false;
+        });
+        $('.move-modal-close').on('click', function () {
+            $('.move-modal-container').fadeOut();
+            return false;
+        });
+
         // ファイルをドラッグオーバーしたときの処理
         $("#file-input").on("dragenter", function (e) {
             // e.preventDefault();
