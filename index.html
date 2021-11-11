@@ -277,7 +277,7 @@
 
                 <div class="form-divider"></div>
 
-                <fieldset>
+                <fieldset class="select-column">
                     <legend>カラムの選択</legend>
 
                     <div class="input-container">
@@ -299,7 +299,7 @@
 
                 <div class="form-divider"></div>
 
-                <fieldset>
+                <fieldset class="edit-plot">
                     <legend>描画の設定</legend>
 
                     <div class="action-button-container">
@@ -383,7 +383,7 @@
 
                 <div class="form-divider"></div>
 
-                <fieldset>
+                <fieldset class="edit-plot-point">
                     <legend>描画点の設定</legend>
 
                     <div class="input-container">
@@ -457,7 +457,7 @@
 
                 <div class="form-divider"></div>
 
-                <fieldset>
+                <fieldset class="edit-heatmap">
                     <legend>ヒートマップの設定</legend>
 
                     <div class="input-container">
@@ -490,7 +490,7 @@
 
                 <div class="form-divider"></div>
 
-                <fieldset>
+                <fieldset class="edit-noise">
                     <legend>ノイズの設定</legend>
 
                     <div class="input-container">
@@ -989,6 +989,13 @@
             $('.move-modal-container').fadeOut();
             return false;
         });
+
+        // プロットのモーダルウィンドウ内要素のアコーディオン
+        $("#plot-opt-form fieldset legend").on("click", function () {
+            $(this).nextAll().slideToggle();
+            $(this).toggleClass("closed");
+        });
+        $("#plot-opt-form fieldset:not(.select-column) legend").click();
 
         // ファイルをドラッグオーバーしたときの処理
         $("#file-input").on("dragenter", function (e) {

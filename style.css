@@ -501,6 +501,27 @@ div.modal-content fieldset>legend {
     padding: 5px 1rem;
     font-size: 1.3rem;
     font-weight: 700;
+
+    cursor: pointer;
+}
+div.modal-content fieldset>legend:after {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 700;
+    content: "\f106";
+  
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1.2;
+    margin-left: 0.6rem;
+    
+    transition: 300ms;
+}
+div.modal-content fieldset>legend.closed:after {
+    display: inline-block;
+    transform: rotate(-180deg);
 }
 
 
