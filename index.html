@@ -1015,6 +1015,9 @@
                 $("#calc-minmax").removeClass("enable").addClass("disable");
             }
         });
+        $('#calc-minmax').on('click', function () {
+            return false;
+        });
 
         // 項目内容に応じて, 決定ボタンを表示する
         $("#plot-opt-form input:required, #plot-opt-form select:required").on("change", function () {
