@@ -23,7 +23,9 @@
     <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="./outputHTML.js"></script>
-    <script> // 色変換の関数定義
+
+    <!--  色変換の関数定義 -->
+    <script>
         //The steps in the jet colorscale
         const jet_data_lin = [
             [0, 0, 0.5],
@@ -55,6 +57,8 @@
             return jetInterpList[i](pow - i);
         };
     </script>
+
+    <!-- その他関数の定義 -->
     <script>
         // 関数定義
         function norm(x, min, max) { // 電力値の正規化
@@ -218,6 +222,7 @@
 
         }
     </script>
+
     <style>
         html,
         body {
@@ -226,8 +231,7 @@
             margin: 0;
             padding: 0;
         }
-    </style>
-    <style>
+
         #map-container {
             position: relative;
             width: 100.0%;
@@ -571,6 +575,8 @@
         </div>
     </div>
 </body>
+
+<!-- ファイル読み込み時の動作 -->
 <script>
     // file-inputボタンのイベント設定 : CSVの読み込み, header取得
     const file = $("#file-input");
@@ -720,6 +726,8 @@
         result.innerHTML = 'File APIに対応したブラウザでご確認ください';
     }
 </script>
+
+<!-- マップへの処理 -->
 <script>
     // ------ マップ描画関係 ------
     const initPos = [35.7, 139.75];
@@ -947,6 +955,8 @@
         return [Math.min.apply(null, parsed_arr), Math.max.apply(null, parsed_arr)]
     }
 </script>
+
+<!-- その他jQueryでの処理 -->
 <script>
     // 各入力項目のチェック
     function checkRequiredElementFilled() {
