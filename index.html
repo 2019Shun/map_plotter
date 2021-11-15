@@ -251,15 +251,15 @@
     <div id="opt-button-container">
         <a class="plot-modal-open" href="">Plot</a>
         <a class="move-modal-open" href="">Move</a>
+        <a class="tile-modal-open" href="">Tile</a>
         <a id="save-button" href="">Save</a>
         <a id="save-button" target="_blank"
             href="https://www.notion.so/Map-Plotter-19aebd0ef33647f0ad13f47ac8133b9b">Usage</a>
     </div>
 
-    <div id="layer-opacity-slider-container">
+    <!-- <div id="layer-opacity-slider-container">
         <input type="range" class="" id="layer-opacity-slider" min="0" max="1" step="0.1" val="0.5">
-        <!-- <label for="layer-opacity-slider">opacity-slider</label> -->
-    </div>
+    </div> -->
 
     <div id="colorbar-container"></div>
 
@@ -379,10 +379,6 @@
                         <label for="plot-nan-input">する</label>
                         <div class="form-underline"></div>
                     </div>
-                    <!-- <div class="input-container">
-                        <label>マップの透明度</label>
-                        <input type="range" id="opacity-input" min="0.1" max="1" step="0.05" value="1"/>
-                    </div> -->
                 </fieldset>
 
                 <div class="form-divider"></div>
@@ -510,8 +506,6 @@
                     </div>
                 </fieldset>
 
-                <div class="form-divider"></div>
-
                 <div id="decide-button-container">
                     <input type="button" id="decide-button" value="プロットする" disabled />
                 </div>
@@ -574,7 +568,53 @@
             </div>
         </div>
     </div>
+
+    <!-- タイルのモーダルウィンドウ -->
+    <div class="lower-modal-container tile-modal-container">
+        <div class="modal-bg tile-modal-close"></div>
+        <div class="modal-content">
+            <fieldset>
+                <legend>各タイルの不透過率</legend>
+
+                <div id="opacity-input-container">
+
+                </div>
+            </fieldset>
+
+            <div id="modal-close-button">
+                <a class="tile-modal-close" href="">閉じる</a>
+            </div>
+        </div>
+    </div>
 </body>
+
+<!-- HTML要素の挿入 -->
+<script>
+    // 不透過率の挿入
+    const getOpacityInputContainer = function (label) {
+        return `
+<div class="input-container">
+<label>${label}</label>
+<select class="have-ul">
+<option value="0.0">0.0</option>
+<option value="0.1">0.1</option>
+<option value="0.2">0.2</option>
+<option value="0.3">0.3</option>
+<option value="0.4">0.4</option>
+<option value="0.5" selected>0.5</option>
+<option value="0.6">0.6</option>
+<option value="0.7">0.7</option>
+<option value="0.8">0.8</option>
+<option value="0.9">0.9</option>
+<option value="1.0">1.0</option>
+</select>
+<div class="form-underline"></div>
+</div>
+`
+    };
+    const labelArr = ["国土地理院:淡色地図", "国土地理院:標準地図", "国土地理院:白地図", "国土地理院:色別標高図", "国土地理院:写真", "国土地理院:陰影起伏図", "OSM", "OSM-Toner"]
+    document.getElementById("opacity-input-container").innerHTML = labelArr.map(getOpacityInputContainer).join("");
+</script>
 
 <!-- ファイル読み込み時の動作 -->
 <script>
@@ -685,7 +725,8 @@
                     });
 
                     // 保存ボタンの挙動変更
-                    const opacity = $("div#layer-opacity-slider-container>input[type=range]").val();
+                    // const opacity = $("div#layer-opacity-slider-container>input[type=range]").val();
+                    const opacity = 0.3;
                     $('#save-button').off("click");
                     $('#save-button').on("click", function () {
                         // 初期位置は描画位置に変更する
@@ -698,7 +739,7 @@
                     // カラーバーのコンテナ表示
                     $("#colorbar-container").fadeTo(500, 1);
 
-                    updateTiles(0.5);
+                    updateTiles(getNowOpacity());
 
                     return false;
                 });
@@ -731,7 +772,12 @@
 <script>
     // ------ マップ描画関係 ------
     const initPos = [35.7, 139.75];
-    const initOpacity = 1.0;
+    const initOpacity = [0.3, 0.3, 0.3, 0.3, 0.8, 0.3, 0.4, 0.3];
+
+    // モーダルウィンドウ内の透明度の項目選択
+    initOpacity.forEach(function (element, i) {
+        $(`#opacity-input-container>.input-container:nth-child(${i + 1}) select`).val(element);
+    });
 
     // マップインスタンス生成
     let map = L.map(
@@ -779,22 +825,8 @@
         });
 
         // 初期タイル選択
-        $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(7).trigger("click");
-
-        // 透過スライダー位置決めとイベントの追加
-        updateLayerOpacitySliderPos();
-        const inner_width = $("div.leaflet-control-container>div.leaflet-top.leaflet-right a").width();
-        $("div#layer-opacity-slider-container").css("height", `${inner_width}px`);
-        $("div.leaflet-control-layers.leaflet-control").on("mouseenter", function () {
-            updateLayerOpacitySliderPos();
-        });
-        $("div.leaflet-control-layers.leaflet-control").on("mouseleave", function () {
-            updateLayerOpacitySliderPos();
-        });
-        $("div#layer-opacity-slider-container>input[type=range]").on("input", function () {
-            $(this).css("background-color", `rgba(20, 128, 230, ${$(this).val()})`);
-            updateTiles($(this).val());
-        });
+        $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(4).trigger("click");
+        $("div.leaflet-control-layers-overlays input[type='checkbox']").eq(6).trigger("click");
 
         // ------ マップイベントに対する
         map.on('moveend', function (e) {
@@ -808,53 +840,47 @@
         $("#now-pos .lng .value").text(center.lng);
     }
 
-    // 透過スライダー位置更新
-    function updateLayerOpacitySliderPos() {
-        const pos_top = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").offset().top;
-        const outer_height = $("div.leaflet-control-container>div.leaflet-top.leaflet-right").outerHeight();
-        $("div#layer-opacity-slider-container").css("top", `${pos_top + outer_height + 10}px`);
-    }
 
     // タイルの取得
-    function getTilesDict(opacity) {
+    function getTilesDict(opacityArray) {
         return {
             "国土地理院:淡色地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", {
                 "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
-                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
+                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacityArray[0], "subdomains": "abc", "tms": false
             }),
             "国土地理院:標準地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", {
                 "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
-                "opacity": opacity
+                "opacity": opacityArray[1]
             }),
             "国土地理院:白地図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png", {
                 "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
-                "maxNativeZoom": 14, "maxZoom": 14, "minZoom": 6, "opacity": opacity
+                "maxNativeZoom": 14, "maxZoom": 14, "minZoom": 6, "opacity": opacityArray[2]
             }),
             "国土地理院:色別標高図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/relief/{z}/{x}/{y}.png", {
                 "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル. 海域部は海上保安庁海洋情報部の資料を使用して作成.</a>",
-                "maxNativeZoom": 15, "maxZoom": 15, "minZoom": 6, "opacity": opacity
+                "maxNativeZoom": 15, "maxZoom": 15, "minZoom": 6, "opacity": opacityArray[3]
             }),
             "国土地理院:写真": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg", {
                 "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a><br>データソース：Landsat8画像（GSI,TSIC,GEO Grid/AIST）, Landsat8画像（courtesy of the U.S. Geological Survey）, 海底地形（GEBCO）",
-                "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 9, "opacity": opacity
+                "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 9, "opacity": opacityArray[4]
             }),
             "国土地理院:陰影起伏図": L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", {
                 "attribution": "<a href='http://maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
-                "maxNativeZoom": 16, "maxZoom": 16, "minZoom": 6, "opacity": opacity
+                "maxNativeZoom": 16, "maxZoom": 16, "minZoom": 6, "opacity": opacityArray[5]
             }),
             "OSM": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 "attribution": "&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors",
-                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
+                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacityArray[6], "subdomains": "abc", "tms": false
             }),
             "OSM-Toner": L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png", {
                 "attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.",
-                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacity, "subdomains": "abc", "tms": false
+                "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": opacityArray[7], "subdomains": "abc", "tms": false
             })
         }
     }
 
     // タイルの更新(選択中のタイルを引き継ぐ)
-    function updateTiles(opacity) {
+    function updateTiles(opacityArray) {
         const layerNum = Object.keys(overLayers).length;
         let checkedList = Array(layerNum);
 
@@ -870,7 +896,7 @@
 
         // レイヤーコントローラーの削除と更新
         layersControl.remove();
-        overLayers = getTilesDict(opacity);
+        overLayers = getTilesDict(opacityArray);
         layersControl = L.control.layers(baseLayers, overLayers).addTo(map);
 
         // レイヤを選択する
@@ -958,7 +984,7 @@
 
 <!-- その他jQueryでの処理 -->
 <script>
-    // 各入力項目のチェック
+    // プロットモーダルでの各入力項目のチェック
     function checkRequiredElementFilled() {
         let filled = true;
         $("#plot-opt-form input:required, #plot-opt-form select:required").each(function (i, e) {
@@ -971,6 +997,14 @@
         });
         return filled;
     };
+
+    // タイルモーダルでの不透過率の一覧取得
+    function getNowOpacity() {
+        return $(`#opacity-input-container>.input-container select`).map(function () {
+            return $(this).val()
+        });
+    }
+
     $(function () {
         // ------ 動作に対するアクション決定系
         // 移動のモーダルウィンドウ関係
@@ -980,7 +1014,15 @@
                 $("input#lng-input").val()
             );
             return false;
-        })
+        });
+        // 不透過率設定へのアクション
+        $(".tile-modal-container select").on("change", function () {
+            if ($(this).val() != "" && $(this).val() != null) {
+                updateTiles($("#opacity-input-container select").map(function () { return $(this).val() }));
+            } else {
+                updateTiles($("#opacity-input-container select").map(function () { return $(this).val() }));
+            }
+        });
         // プロットのモーダルウィンドウ関係
         $('.plot-modal-open').on('click', function () {
             $('.plot-modal-container').fadeIn();
@@ -997,6 +1039,15 @@
         });
         $('.move-modal-close').on('click', function () {
             $('.move-modal-container').fadeOut();
+            return false;
+        });
+        // タイルのモーダルウィンドウ関係
+        $('.tile-modal-open').on('click', function () {
+            $('.tile-modal-container').fadeIn();
+            return false;
+        });
+        $('.tile-modal-close').on('click', function () {
+            $('.tile-modal-container').fadeOut();
             return false;
         });
 

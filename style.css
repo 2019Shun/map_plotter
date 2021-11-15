@@ -100,56 +100,60 @@
     margin-left: 3px;
 }
 /* 各ボタンの配色 */
-#opt-button-container>a:nth-child(1) {
-    background-color: rgb(20, 128, 230);
-    box-shadow: 0.25rem 0.35rem 0.1rem rgb(20, 97, 170);
+#opt-button-container>a:nth-child(2n+1) {
+    /* background-color: rgb(20, 128, 230); */
+    /* box-shadow: 0.25rem 0.35rem 0.1rem rgb(20, 97, 170); */
+    background-color: rgb(5, 88, 167);
+    box-shadow: 0.25rem 0.35rem 0.1rem rgb(4, 65, 122);
 }
-#opt-button-container>a:nth-child(1):hover {
+#opt-button-container>a:nth-child(2n+1):hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
-    box-shadow: 0.2rem 0.2rem 0.1rem rgb(13, 81, 144);
+    box-shadow: 0.2rem 0.2rem 0.1rem rgb(9, 57, 102)
 }
-#opt-button-container>a:nth-child(2) {
-    background-color: rgb(235, 113, 14);
-    box-shadow: 0.25rem 0.35rem 0.1rem rgb(179, 108, 16);
+#opt-button-container>a:nth-child(2n) {
+    /* background-color: rgb(235, 113, 14); */
+    /* box-shadow: 0.25rem 0.35rem 0.1rem rgb(179, 108, 16); */
+    background-color: rgb(77, 192, 237);
+    box-shadow: 0.25rem 0.35rem 0.1rem rgb(48, 123, 153);
 }
-#opt-button-container>a:nth-child(2):hover {
+#opt-button-container>a:nth-child(2n):hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
-    box-shadow: 0.2rem 0.2rem 0.1rem rgb(144, 98, 13);
+    box-shadow: 0.2rem 0.2rem 0.1rem rgb(32, 81, 100);
 }
-#opt-button-container>a:nth-child(3) {
+/* #opt-button-container>a:nth-child(3) {
     background-color: rgb(7, 207, 57);
     box-shadow: 0.25rem 0.35rem 0.1rem rgb(14, 149, 43);
 }
 #opt-button-container>a:nth-child(3):hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
     box-shadow: 0.2rem 0.2rem 0.1rem rgb(7, 102, 38);
-}
-#opt-button-container>a:nth-child(4) {
+} */
+#opt-button-container>a:last-child {
     background-color: rgb(146, 146, 146);
     box-shadow: 0.25rem 0.35rem 0.1rem rgb(119, 119, 119);
 }
-#opt-button-container>a:nth-child(4):hover {
+#opt-button-container>a:last-child:hover {
     text-shadow: 0.05rem 0.05rem 0.02rem rgba(255, 255, 255, 0.3);
-    box-shadow: 0.2rem 0.2rem 0.1rem rgb(78, 78, 78);
+    box-shadow: 0.2rem 0.2rem 0.1rem rgb(95, 95, 95);
 }
 
 
 
 /* ----- モーダルウィンドウ ----- */
-.modal-container{
+.modal-container {
     display: none;
     height: 100vh;
     position: fixed;
     top: 0;
     width: 100%;
 }
-.modal-bg{
+.modal-container .modal-bg {
     background: rgba(0,0,0,0.8);
     height: 100vh;
     position: absolute;
     width: 100%;
 }
-.modal-content{
+.modal-container .modal-content {
     overflow: scroll;
     background: #fff;
     left: 50%;
@@ -160,6 +164,33 @@
     width: 60%;
     height: 70vh;
 }
+
+/* ----- 下部表示モーダルウィンドウ ----- */
+.lower-modal-container {
+    display: none;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+.lower-modal-container .modal-bg {
+    background: rgba(0, 0, 0, 0.205);
+    height: 100vh;
+    position: absolute;
+    width: 100%;
+}
+.lower-modal-container .modal-content {
+    overflow: scroll;
+    background: #fff;
+    left: 50%;
+    padding: 0.5rem 3%;
+    position: absolute;
+    top: 83%;
+    transform: translate(-50%,-50%);
+    width: 97%;
+    height: 30vh;
+}
+
 /* ----- ファイル入力フォーム ----- */
 #outer-file-input-container {
     text-align: left;
@@ -255,6 +286,10 @@ input[type=file]::-webkit-file-upload-button {
     color: rgb(39, 39, 39);
     transition: .5s;
 }
+.tile-modal-container .input-container {
+    display: inline-block;
+
+}
 .form-underline{
     position: relative; /*.form-underline::beforeの親要素*/
     border-top: 2px solid #c2c2c2; /*text3の下線*/
@@ -341,7 +376,7 @@ input[type=file]::-webkit-file-upload-button {
 }
 /* ----- 戻るボタンの装飾 ----- */
 #modal-close-button {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: center;
     width: 100%;
 }
@@ -372,7 +407,7 @@ input[type=file]::-webkit-file-upload-button {
 
 /* ----- 移動用モーダルウィンドウの決定ボタンの装飾 ----- */
 #decide-button-container {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: center;
     width: 100%;
 }
@@ -491,7 +526,7 @@ input[type=file]::-webkit-file-upload-button {
 /* ----- モーダル : 各セクション ----- */
 div.modal-content fieldset {
     /* background-color: rgba(150, 150, 150, 0.1); */
-    padding: 0 1rem .7rem;
+    padding: 0 1rem .2rem;
     border-color: rgba(0, 0, 0, 0);
     border-radius: 1rem;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
