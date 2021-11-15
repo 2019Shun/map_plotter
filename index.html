@@ -1046,7 +1046,7 @@
         });
 
         // プロットのモーダルウィンドウ内要素のアコーディオン
-        $("#plot-opt-form fieldset legend").on("click", function () {
+        $("fieldset legend").on("click", function () {
             $(this).nextAll().slideToggle();
             $(this).toggleClass("closed");
         });
