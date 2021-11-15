@@ -257,10 +257,6 @@
             href="https://www.notion.so/Map-Plotter-19aebd0ef33647f0ad13f47ac8133b9b">Usage</a>
     </div>
 
-    <!-- <div id="layer-opacity-slider-container">
-        <input type="range" class="" id="layer-opacity-slider" min="0" max="1" step="0.1" val="0.5">
-    </div> -->
-
     <div id="colorbar-container"></div>
 
     <!-- 描画のモーダルウィンドウ -->
@@ -330,9 +326,9 @@
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
-                            <option value="5">5</option>
+                            <option value="5" selected>5</option>
                             <option value="8">8</option>
-                            <option value="10" selected>10</option>
+                            <option value="10">10</option>
                             <option value="15">15</option>
                             <option value="20">20</option>
                             <option value="30">30</option>
@@ -725,7 +721,6 @@
                     });
 
                     // 保存ボタンの挙動変更
-                    // const opacity = $("div#layer-opacity-slider-container>input[type=range]").val();
                     const opacity = 0.3;
                     $('#save-button').off("click");
                     $('#save-button').on("click", function () {
@@ -988,7 +983,6 @@
     function checkRequiredElementFilled() {
         let filled = true;
         $("#plot-opt-form input:required, #plot-opt-form select:required").each(function (i, e) {
-            // console.log($(this).prop("id"), $(this).prop("disabled"));
             if ($(e).val() == "" || $(e).val() == null) {
                 if (!$(e).prop("disabled")) {
                     filled = false;
