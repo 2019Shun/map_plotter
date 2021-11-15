@@ -972,7 +972,7 @@
     // データのうち, 電力列における最小・最大値を取得する
     function getMinMax(data, powIndex) {
         let data_T = data[0].map((_, c) => data.map(r => r[c]));
-        let parsed_arr = data_T[powIndex].flatMap((v, i) => i === 0 ? [] : parseFloat(v));
+        let parsed_arr = data_T[powIndex].flatMap((v, i) => (i === 0) || (v === "") ? [] : parseFloat(v));
         return [Math.min.apply(null, parsed_arr), Math.max.apply(null, parsed_arr)]
     }
 </script>
