@@ -623,3 +623,21 @@ div.modal-content fieldset>legend.closed:after {
     color: rgb(236, 41, 41);
     font-weight: 900;
 }
+
+/* ----- 入力項目の「オプション」の装飾 ----- */
+#op-blue {
+    color: rgb(21, 56, 212);
+    font-weight: 900;
+}
+
+
+/* ----- 矢印表示用の装飾 ----- */
+.arrow-icon {
+    width: 10px;
+    height: 10px;
+}
+.arrow-icon > div {
+    margin-left: -1px;
+    margin-top: -3px;
+    transform-origin: center center;
+}
