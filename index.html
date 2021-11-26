@@ -295,6 +295,11 @@
                         <select class="have-ul index-selector" required id="pow-index-selector" disabled></select>
                         <div class="form-underline"></div>
                     </div>
+                    <div class="input-container">
+                        <label><span id="op-blue">(オプション)</span>矢印の角度(方位角)の値の列</label>
+                        <select class="have-ul index-selector" id="angle-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
                 </fieldset>
 
                 <div class="form-divider"></div>
@@ -681,6 +686,7 @@
                 $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
                 $('#decide-button').on("click", function () {
                     $('#map-container svg g').empty();
+                    $('#map-container > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-marker-pane').empty()
 
                     $('.plot-modal-container').fadeOut();
 
@@ -707,8 +713,14 @@
                     const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
                     const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
 
-                    // 点の描画
-                    plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                    if ($("#angle-index-selector").val() == "" || $("#angle-index-selector").val() == null){
+                        // 点の描画
+                        plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                    }else{
+                        // 矢印の値が選択されていれば矢印を描画
+                        const angIndex = parseInt($("#angle-index-selector").val());
+                        plotAllArrows(data, step, latIndex, lngIndex, powIndex, angIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                    }
 
                     // カラーバーの作製/更新
                     updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap);
@@ -952,6 +964,59 @@
             ).addTo(map);
 
             c.bindPopup(`緯度 : ${lat}<br>経度 : ${lng}<br>値 : ${pow}`);
+            c.on("mouseover", function (e) {
+                this.openPopup();
+            });
+            c.on("mouseout", function (e) {
+                this.closePopup();
+            });
+        }
+    };
+
+    // 矢印のプロットのための関数
+    function plotAllArrows(data, step, latIndex, lngIndex, powIndex, angIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
+        for (let i = 1; i < data.length; i += step) {
+            if (data[i].length < 3) {
+                continue;
+            }
+
+            // 点を描画するかどうかのチェック
+            if (data[i][powIndex] < threshold) { // thresholdによるチェック (ちなみにthreshold is NaN なら Falseになる)
+                continue;
+            } else if (!plotNan && isNaN(data[i][powIndex])) {
+                continue;
+            } else if (!plotNan && (data[i][powIndex].length == 0)) {
+                continue;
+            }
+
+            const lat = parseFloat(data[i][latIndex]);
+            const lng = parseFloat(data[i][lngIndex]);
+            const pow = parseFloat(data[i][powIndex]);
+            const ang = parseFloat(data[i][angIndex])-90; // 方位角に合わせるため，-90度している
+
+            // ノイズとの差のチェック, index=-1の時, チェックしない.
+            // 電力の方がNaNのときは描画する
+            if (noiseIndex >= 0) {
+                const noise = parseFloat(data[i][noiseIndex]);
+                if ((pow - noise) < noiseDiff) {
+                    continue;
+                }
+            }
+
+            const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
+
+            var divicon = L.divIcon(
+                { 
+                    className: 'arrow-icon', 
+                    iconSize: "auto",
+                    // sizeはradiusの4倍くらいが丁度いい？要検討
+                    html: '<div style="font-size:' + (radius*4).toString() + 'px; color:' + color + '; transform: rotate(' + ang.toString() + 'deg)">➤</div>' ,
+                    iconAnchor: [-(radius*2), (radius*2)]
+                }
+            );
+            c = L.marker([lat, lng], {icon: divicon}).addTo(map);
+
+            c.bindPopup(`緯度 : ${lat}<br>経度 : ${lng}<br>値 : ${pow}<br>方位角 : ${ang}`);
             c.on("mouseover", function (e) {
                 this.openPopup();
             });
