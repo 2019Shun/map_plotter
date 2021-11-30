@@ -1219,6 +1219,11 @@
             $("#file-input-drop-box").removeClass("drag-enter")
         });
 
+        // 「ファイルを選択」をクリックしたときの処理
+        $("#file-input-container").on("click", function () {
+            $('input#file-input').trigger('click');
+        });
+
         // 電力の列が入力された際に「描画の設定」: 最小値・最大値のセットボタンを有効化＆挙動追加
         $("#pow-index-selector").on("change", function () {
             if ($(this).val() != "" && $(this).val() != null && !$(this).prop("disabled")) {
