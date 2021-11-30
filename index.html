@@ -295,11 +295,6 @@
                         <select class="have-ul index-selector" required id="pow-index-selector" disabled></select>
                         <div class="form-underline"></div>
                     </div>
-                    <div class="input-container">
-                        <label><span id="op-blue">(オプション)</span>矢印の角度(方位角)の値の列</label>
-                        <select class="have-ul index-selector" id="angle-index-selector" disabled></select>
-                        <div class="form-underline"></div>
-                    </div>
                 </fieldset>
 
                 <div class="form-divider"></div>
@@ -507,6 +502,29 @@
                     </div>
                 </fieldset>
 
+                <div class="form-divider"></div>
+
+                <fieldset class="edit-noise">
+                    <legend>方位角の設定</legend>
+
+                    <div class="input-container">
+                        <label>方位角の列</label>
+                        <select class="have-ul index-selector" id="angle-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <div class="input-container">
+                        <label>マーカーの設定</label>
+                        <select class="have-ul" required id="angle-marker-selector">
+                            <option value="xxx">XXX</option>
+                            <option value="yyy">YYY</option>
+                            <option value="zzz" selected>ZZZ</option>
+                        </select>
+                        <div class="form-underline"></div>
+                    </div>
+                </fieldset>
+
+
                 <div id="decide-button-container">
                     <input type="button" id="decide-button" value="プロットする" disabled />
                 </div>
@@ -713,13 +731,14 @@
                     const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
                     const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
 
-                    if ($("#angle-index-selector").val() == "" || $("#angle-index-selector").val() == null){
+                    if ($("#angle-index-selector").val() == "" || $("#angle-index-selector").val() == null) {
                         // 点の描画
                         plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
-                    }else{
+                    } else {
                         // 矢印の値が選択されていれば矢印を描画
                         const angIndex = parseInt($("#angle-index-selector").val());
-                        plotAllArrows(data, step, latIndex, lngIndex, powIndex, angIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                        const angMarker = "HOGE@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                        plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker);
                     }
 
                     // カラーバーの作製/更新
@@ -795,6 +814,7 @@
             zoom: 13,
             zoomControl: true,
             preferCanvas: false,
+            // preferCanvas: true,
         }
     );
 
@@ -974,7 +994,7 @@
     };
 
     // 矢印のプロットのための関数
-    function plotAllArrows(data, step, latIndex, lngIndex, powIndex, angIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff) {
+    function plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker) {
         for (let i = 1; i < data.length; i += step) {
             if (data[i].length < 3) {
                 continue;
@@ -992,7 +1012,7 @@
             const lat = parseFloat(data[i][latIndex]);
             const lng = parseFloat(data[i][lngIndex]);
             const pow = parseFloat(data[i][powIndex]);
-            const ang = parseFloat(data[i][angIndex])-90; // 方位角に合わせるため，-90度している
+            const ang = parseFloat(data[i][angIndex]);
 
             // ノイズとの差のチェック, index=-1の時, チェックしない.
             // 電力の方がNaNのときは描画する
@@ -1005,16 +1025,91 @@
 
             const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
 
+            // 各マーカーのSVGを設定
+            const svgMarkerV3Short = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <circle
+       fill="${color}"
+       r="3"
+       cy="24"
+       cx="24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="2"
+       stroke="${color}"
+       d="M 24,8.8 V 24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="2"
+       stroke="${color}"
+       d="m 17,16 7,-7.5 7,7.5" />
+  </g>
+</svg>`;
+
+            const svgMarkerV3Normal = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <circle
+       fill="${color}"
+       r="3"
+       cy="24"
+       cx="24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="2"
+       stroke="${color}"
+       d="M 24,2 V 24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="2"
+       stroke="${color}"
+       d="m 17,9.1 7,-7.5 7,7.5" />
+  </g>
+</svg>`;
+
+            const svgMarkerV2Normal = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+     d="m 36,24.019918 c 0,-8.73 -12,-20.6800002 -12,-20.6800002 0,0 -12,11.9500002 -12,20.6800002 a 12,12 0 0 0 24,0 z"
+     fill="none"
+     stroke="${color}"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke-width="4"
+     id="path6" />
+  <circle
+     cx="24"
+     cy="24"
+     r="4"
+     id="pointer"
+     fill="${color}" />
+  </g>
+</svg>`;
+
             var divicon = L.divIcon(
-                { 
-                    className: 'arrow-icon', 
-                    iconSize: "auto",
-                    // sizeはradiusの4倍くらいが丁度いい？要検討
-                    html: '<div style="font-size:' + (radius*4).toString() + 'px; color:' + color + '; transform: rotate(' + ang.toString() + 'deg)">➤</div>' ,
-                    iconAnchor: [-(radius*2), (radius*2)]
+                {
+                    className: "",
+                    iconSize: [4 * radius, 4 * radius],
+                    html: svgMarkerV2Normal,
+                    iconAnchor: [2 * radius, 2 * radius]
                 }
             );
-            c = L.marker([lat, lng], {icon: divicon}).addTo(map);
+            c = L.marker([lat, lng], { icon: divicon }).addTo(map);
 
             c.bindPopup(`緯度 : ${lat}<br>経度 : ${lng}<br>値 : ${pow}<br>方位角 : ${ang}`);
             c.on("mouseover", function (e) {
