@@ -472,6 +472,9 @@
                     <div class="input-container">
                         <label>マーカータイプ</label>
                         <select class="have-ul" required id="angle-marker-selector" disabled>
+                            <option value="v1-narrow">v1 (narrow)</option>
+                            <option value="v1-normal">v1 (normal)</option>
+                            <option value="v1-broad">v1 (broad)</option>
                             <option value="v2-normal">v2</option>
                             <option value="v3-normal" selected>v3 (normal)</option>
                             <option value="v3-short">v3 (short)</option>
@@ -999,7 +1002,76 @@
 
             // 各マーカーのSVGを設定
             let svgMarker = "";
-            if (angMarker === "v2-normal") {
+            if (angMarker === "v1-narrow") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+       stroke="${color}"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       fill="${color}"
+       stroke-width="1"
+       d="M 24,24 l -6,8 6,-30 l 6,30 -6,-8" />
+    <circle
+       stroke="${color}"
+       stroke-width="1"
+       fill="#fff"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+  </g>
+</svg>`;
+            } else if (angMarker === "v1-normal") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+       stroke="${color}"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       fill="${color}"
+       stroke-width="1"
+       d="M 24,24 l -12,8 12,-30 l 12,30 -12,-8" />
+    <circle
+       stroke="${color}"
+       stroke-width="1"
+       fill="#fff"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+  </g>
+</svg>`;
+            } else if (angMarker === "v1-broad") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+       stroke="${color}"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       fill="${color}"
+       stroke-width="1"
+       d="M 24,24 l -18,8 18,-30 l 18,30 -18,-8" />
+    <circle
+       stroke="${color}"
+       stroke-width="1"
+       fill="#fff"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+  </g>
+</svg>`;
+            } else if (angMarker === "v2-normal") {
                 svgMarker = `
 <svg 
   viewBox="0 0 48 48" 
