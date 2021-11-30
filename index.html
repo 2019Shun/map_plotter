@@ -265,7 +265,7 @@
         <div class="modal-content">
             <form id="plot-opt-form">
                 <div id="outer-file-input-container">
-                    <input type="file" id="file-input" />
+                    <input type="file" id="file-input" required />
                     <div id="file-input-drop-box">
                         <div>ファイルをここにドロップ</div>
                     </div>
@@ -318,57 +318,27 @@
                             placeholder="カラーバー最大値" />
                         <div class="form-underline"></div>
                     </div>
+
                     <div class="input-container">
-                        <label>描画点の大きさ</label>
-
-                        <select class="have-ul" required id="radius-selector">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5" selected>5</option>
-                            <option value="8">8</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="500">500</option>
-                            <option value="1000">1000</option>
-                            <option value="5000">5000</option>
-                            <option value="20000">20000</option>
-                        </select>
-
+                        <label><span id="req-red">(必須)</span>描画点の大きさ</label>
+                        <input type="number" class="have-ul" required id="radius-input" value="5" min="1" step="1"
+                            placeholder="1以上の値" />
                         <div class="form-underline"></div>
                     </div>
+
                     <div class="input-container">
                         <label>描画閾値 (この値以上の点のみ描画される)</label>
                         <input type="number" class="have-ul" id="threshold-input" value="" placeholder="閾値" />
                         <div class="form-underline"></div>
                     </div>
+
                     <div class="input-container">
-                        <label>データの間引き</label>
-
-                        <select class="have-ul" id="step-selector">
-                            <option value="1" selected>そのまま</option>
-                            <option value="2">1/2</option>
-                            <option value="3">1/3</option>
-                            <option value="4">1/4</option>
-                            <option value="5">1/5</option>
-                            <option value="10">1/10</option>
-                            <option value="15">1/15</option>
-                            <option value="20">1/20</option>
-                            <option value="30">1/30</option>
-                            <option value="50">1/50</option>
-                            <option value="100">1/100</option>
-                            <option value="200">1/200</option>
-                            <option value="500">1/500</option>
-                            <option value="1000">1/1000</option>
-                        </select>
-
+                        <label><span id="req-red">(必須)</span>データの間引き(1/N)</label>
+                        <input type="number" class="have-ul" required id="step-input" value="1" min="1" step="1"
+                            placeholder="整数値(1/1なら間引かない)" />
                         <div class="form-underline"></div>
                     </div>
+
                     <div class="input-container">
                         <label>NaNの点(値の無い点)を描画</label>
                         <input type="checkbox" class="have-ul" id="plot-nan-input" checked />
@@ -390,23 +360,9 @@
                     </div>
 
                     <div class="input-container">
-                        <label>枠線の幅</label>
-
-                        <select class="have-ul" id="stroke-width-selector">
-                            <option value="1" selected>1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="200">200</option>
-                        </select>
-
+                        <label><span id="req-red">(必須)</span>枠線の太さ</label>
+                        <input type="number" class="have-ul" required id="stroke-width-input" value="1" min="0.1"
+                            step="0.1" placeholder="0.1以上" />
                         <div class="form-underline"></div>
                     </div>
 
@@ -729,13 +685,13 @@
                     const powMin = parseInt($("#pow-min-input").val());
                     const powMax = parseInt($("#pow-max-input").val());
 
-                    const radius = parseInt($("#radius-selector").val());
+                    const radius = parseInt($("#radius-input").val());
                     const threshold = parseFloat($("#threshold-input").val());
-                    const step = parseInt($("#step-selector").val());
+                    const step = parseInt($("#step-input").val());
                     const plotNan = $("#plot-nan-input").prop("checked");
 
                     const fillCircle = $("#fill-circle-input").prop("checked");
-                    const strokeWidth = parseInt($("#stroke-width-selector").val());
+                    const strokeWidth = parseFloat($("#stroke-width-input").val());
                     const fillOpacity = parseFloat($("#fill-opacity-selector").val());
                     const strokeOpacity = parseFloat($("#stroke-opacity-selector").val());
 
@@ -1185,7 +1141,8 @@
         $("#plot-opt-form input:required, #plot-opt-form select:required").each(function (i, e) {
             if ($(e).val() == "" || $(e).val() == null) {
                 if (!$(e).prop("disabled")) {
-                    filled = false;
+                    filled = false; // checkRequiredElementFilled()の戻り値
+                    return false;   // $.eachのループブレイク (わかりずらい...)
                 }
             }
         });
@@ -1286,6 +1243,17 @@
             }
             $("#decide-button").prop("disabled", false).change();
         });
+        $('.input-container > input[type=number]:required').on('mouseup keyup', function (e) {
+            if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
+                $("#decide-button").prop("disabled", true).change();
+                return;
+            }
+            if (!checkRequiredElementFilled()) {
+                $("#decide-button").prop("disabled", true).change();
+                return;
+            }
+            $("#decide-button").prop("disabled", false).change();
+        });
 
         // 大小のチェック
         $("#pow-min-input").on("change", function () {
@@ -1327,6 +1295,15 @@
                 $("#angle-marker-lw-input").prev().children("span").text("(必須)");
                 $("#angle-marker-pr-input").prev().children("span").text("(必須)");
             }
+        });
+
+        // type=number の input 入力時に適応される処理
+        $('.input-container > input[type=number]').on('mouseup keyup', function (e) {
+            var lw = parseFloat($(this).val());
+            var lwMax = parseFloat($(this).attr('max'));
+            var lwMin = parseFloat($(this).attr('min'));
+            if (lw > lwMax) { $(this).val(lwMax); }
+            if (lw < lwMin) { $(this).val(lwMin); }
         });
 
         // 入力フォーム部分の下線部とか文字装飾アニメーション
