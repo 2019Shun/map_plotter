@@ -502,6 +502,43 @@
                     </div>
                 </fieldset>
 
+                <div class="form-divider"></div>
+
+                <fieldset class="edit-noise">
+                    <legend>方位角の設定</legend>
+
+                    <div class="input-container">
+                        <label>方位角の列</label>
+                        <select class="have-ul index-selector" id="angle-index-selector" disabled></select>
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <div class="input-container">
+                        <label>マーカータイプ</label>
+                        <select class="have-ul" required id="angle-marker-selector" disabled>
+                            <option value="v2-normal">v2</option>
+                            <option value="v3-normal" selected>v3 (normal)</option>
+                            <option value="v3-short">v3 (short)</option>
+                        </select>
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <div class="input-container">
+                        <label><span id="req-red"></span>線の太さ</label>
+                        <input type="number" class="have-ul" required id="angle-marker-lw-input" value="3" min="0.1"
+                            step="0.1" placeholder="0.1以上の値" disabled />
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <div class="input-container">
+                        <label><span id="req-red"></span>点の大きさ</label>
+                        <input type="number" class="have-ul" required id="angle-marker-pr-input" value="4" min="0.1"
+                            step="0.1" placeholder="0.1以上の値" disabled />
+                        <div class="form-underline"></div>
+                    </div>
+                </fieldset>
+
+
                 <div id="decide-button-container">
                     <input type="button" id="decide-button" value="プロットする" disabled />
                 </div>
@@ -681,6 +718,7 @@
                 $('#decide-button').off("click"); // onによるイベントの追加は上書きでないため, 一旦古いものを削除
                 $('#decide-button').on("click", function () {
                     $('#map-container svg g').empty();
+                    $('#map-container > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-marker-pane').empty()
 
                     $('.plot-modal-container').fadeOut();
 
@@ -707,8 +745,17 @@
                     const noiseIndex = ($("#noise-diff-input").prop("disabled") ? -1 : parseInt($("#noise-index-selector").val()));
                     const noiseDiff = ($("#noise-diff-input").prop("disabled") ? 0 : parseFloat($("#noise-diff-input").val()));
 
-                    // 点の描画
-                    plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                    if ($("#angle-index-selector").val() == "" || $("#angle-index-selector").val() == null) {
+                        // 点の描画
+                        plotAllCircles(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff);
+                    } else {
+                        // 矢印の値が選択されていれば矢印を描画
+                        const angIndex = parseInt($("#angle-index-selector").val());
+                        const angMarker = $("#angle-marker-selector").val();
+                        const angMarkerLineWidth = parseFloat($("#angle-marker-lw-input").val());
+                        const angMarkerPointRadius = parseFloat($("#angle-marker-pr-input").val());
+                        plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker, angMarkerLineWidth, angMarkerPointRadius);
+                    }
 
                     // カラーバーの作製/更新
                     updateColorbar(powMin, powMax, interpolateTheme, reverseHeatmap);
@@ -783,6 +830,7 @@
             zoom: 13,
             zoomControl: true,
             preferCanvas: false,
+            // preferCanvas: true,
         }
     );
 
@@ -961,6 +1009,157 @@
         }
     };
 
+    // 矢印のプロットのための関数
+    function plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker, angMarkerLineWidth, angMarkerPointRadius) {
+        for (let i = 1; i < data.length; i += step) {
+            if (data[i].length < 3) {
+                continue;
+            }
+
+            // 点を描画するかどうかのチェック
+            if (data[i][powIndex] < threshold) { // thresholdによるチェック (ちなみにthreshold is NaN なら Falseになる)
+                continue;
+            } else if (!plotNan && isNaN(data[i][powIndex])) {
+                continue;
+            } else if (!plotNan && (data[i][powIndex].length == 0)) {
+                continue;
+            }
+
+            const lat = parseFloat(data[i][latIndex]);
+            const lng = parseFloat(data[i][lngIndex]);
+            const pow = parseFloat(data[i][powIndex]);
+            const ang = parseFloat(data[i][angIndex]);
+
+            // ノイズとの差のチェック, index=-1の時, チェックしない.
+            // 電力の方がNaNのときは描画する
+            if (noiseIndex >= 0) {
+                const noise = parseFloat(data[i][noiseIndex]);
+                if ((pow - noise) < noiseDiff) {
+                    continue;
+                }
+            }
+
+            const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
+
+            // 各マーカーのSVGを設定
+            let svgMarker = "";
+            if (angMarker === "v2-normal") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+     d="m 36,24.019918 c 0,-8.73 -12,-20.6800002 -12,-20.6800002 0,0 -12,11.9500002 -12,20.6800002 a 12,12 0 0 0 24,0 z"
+     fill="none"
+     stroke="${color}"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke-width="${angMarkerLineWidth}" />
+  <circle
+     cx="24"
+     cy="24"
+     r="${angMarkerPointRadius}"
+     fill="${color}" />
+  </g>
+</svg>`;
+            } else if (angMarker === "v3-normal") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <circle
+       fill="${color}"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="M 24,2 V 24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="m 17,9.1 7,-7.5 7,7.5" />
+  </g>
+</svg>`;;
+            } else if (angMarker === "v3-short") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <circle
+       fill="${color}"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="M 24,8.8 V 24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="m 17,16 7,-7.5 7,7.5" />
+  </g>
+</svg>`;
+            } else {
+                console.log("予期しない入力 @angMarker");
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+     d="m 36,24.019918 c 0,-8.73 -12,-20.6800002 -12,-20.6800002 0,0 -12,11.9500002 -12,20.6800002 a 12,12 0 0 0 24,0 z"
+     fill="none"
+     stroke="${color}"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke-width="${angMarkerLineWidth}" />
+  <circle
+     cx="24"
+     cy="24"
+     r="${angMarkerPointRadius}"
+     fill="${color}" />
+  </g>
+</svg>`;
+            }
+
+            var divicon = L.divIcon(
+                {
+                    className: "",
+                    iconSize: [4 * radius, 4 * radius],
+                    html: svgMarker,
+                    iconAnchor: [2 * radius, 2 * radius]
+                }
+            );
+            c = L.marker([lat, lng], { icon: divicon }).addTo(map);
+
+            c.bindPopup(`緯度 : ${lat}<br>経度 : ${lng}<br>値 : ${pow}<br>方位角 : ${ang}`);
+            c.on("mouseover", function (e) {
+                this.openPopup();
+            });
+            c.on("mouseout", function (e) {
+                this.closePopup();
+            });
+        }
+    };
+
     function resetPos(lat, lng) {
         if (lat !== "" && lng !== "") {
             if ((-90 <= lat <= 90) && (-180 <= lng <= 180)) {
@@ -1107,6 +1306,25 @@
             } else {
                 $("#noise-diff-input").prop("disabled", false).change();
                 $("#noise-diff-input").prev().children("span").text("(必須)");
+            }
+        });
+
+        // 方位角のカラムを選択時の処理
+        $("#angle-index-selector").on("change", function () {
+            if ($(this).val() == "" || $(this).val() == null) {
+                $("#angle-marker-selector").prop("disabled", true).change();
+                $("#angle-marker-lw-input").prop("disabled", true).change();
+                $("#angle-marker-pr-input").prop("disabled", true).change();
+                $("#angle-marker-selector").prev().children("span").text("");
+                $("#angle-marker-lw-input").prev().children("span").text("");
+                $("#angle-marker-pr-input").prev().children("span").text("");
+            } else {
+                $("#angle-marker-selector").prop("disabled", false).change();
+                $("#angle-marker-lw-input").prop("disabled", false).change();
+                $("#angle-marker-pr-input").prop("disabled", false).change();
+                $("#angle-marker-selector").prev().children("span").text("(必須)");
+                $("#angle-marker-lw-input").prev().children("span").text("(必須)");
+                $("#angle-marker-pr-input").prev().children("span").text("(必須)");
             }
         });
 
