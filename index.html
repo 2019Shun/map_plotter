@@ -318,7 +318,15 @@
                             placeholder="カラーバー最大値" />
                         <div class="form-underline"></div>
                     </div>
+
                     <div class="input-container">
+                        <label><span id="req-red">(必須)</span>描画点の大きさ</label>
+                        <input type="number" class="have-ul" required id="radius-input" value="5" min="1" step="1"
+                            placeholder="1以上の値" />
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <!-- <div class="input-container">
                         <label>描画点の大きさ</label>
 
                         <select class="have-ul" required id="radius-selector">
@@ -341,16 +349,24 @@
                         </select>
 
                         <div class="form-underline"></div>
-                    </div>
+                    </div> -->
                     <div class="input-container">
                         <label>描画閾値 (この値以上の点のみ描画される)</label>
                         <input type="number" class="have-ul" id="threshold-input" value="" placeholder="閾値" />
                         <div class="form-underline"></div>
                     </div>
+
                     <div class="input-container">
+                        <label><span id="req-red">(必須)</span>データの間引き(1/N)</label>
+                        <input type="number" class="have-ul" required id="step-input" value="1" min="1" step="1"
+                            placeholder="整数値(1/1なら間引かない)" />
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <!-- <div class="input-container">
                         <label>データの間引き</label>
 
-                        <select class="have-ul" id="step-selector">
+                        <select class="have-ul" id="step-input">
                             <option value="1" selected>そのまま</option>
                             <option value="2">1/2</option>
                             <option value="3">1/3</option>
@@ -368,7 +384,8 @@
                         </select>
 
                         <div class="form-underline"></div>
-                    </div>
+                    </div> -->
+
                     <div class="input-container">
                         <label>NaNの点(値の無い点)を描画</label>
                         <input type="checkbox" class="have-ul" id="plot-nan-input" checked />
@@ -729,9 +746,9 @@
                     const powMin = parseInt($("#pow-min-input").val());
                     const powMax = parseInt($("#pow-max-input").val());
 
-                    const radius = parseInt($("#radius-selector").val());
+                    const radius = parseInt($("#radius-input").val());
                     const threshold = parseFloat($("#threshold-input").val());
-                    const step = parseInt($("#step-selector").val());
+                    const step = parseInt($("#step-input").val());
                     const plotNan = $("#plot-nan-input").prop("checked");
 
                     const fillCircle = $("#fill-circle-input").prop("checked");
@@ -1184,7 +1201,8 @@
         $("#plot-opt-form input:required, #plot-opt-form select:required").each(function (i, e) {
             if ($(e).val() == "" || $(e).val() == null) {
                 if (!$(e).prop("disabled")) {
-                    filled = false;
+                    filled = false; // checkRequiredElementFilled()の戻り値
+                    return false;   // $.eachのループブレイク (わかりずらい...)
                 }
             }
         });
@@ -1285,6 +1303,17 @@
             }
             $("#decide-button").prop("disabled", false).change();
         });
+        $('.input-container > input[type=number]:required').on('mouseup keyup', function (e) {
+            if (parseInt($("#pow-min-input").val()) > parseInt($("#pow-max-input").val())) {
+                $("#decide-button").prop("disabled", true).change();
+                return;
+            }
+            if (!checkRequiredElementFilled()) {
+                $("#decide-button").prop("disabled", true).change();
+                return;
+            }
+            $("#decide-button").prop("disabled", false).change();
+        });
 
         // 大小のチェック
         $("#pow-min-input").on("change", function () {
@@ -1326,6 +1355,15 @@
                 $("#angle-marker-lw-input").prev().children("span").text("(必須)");
                 $("#angle-marker-pr-input").prev().children("span").text("(必須)");
             }
+        });
+
+        // type=number の input 入力時に適応される処理
+        $('.input-container > input[type=number]').on('mouseup keyup', function (e) {
+            var lw = parseFloat($(this).val());
+            var lwMax = parseFloat($(this).attr('max'));
+            var lwMin = parseFloat($(this).attr('min'));
+            if (lw > lwMax) { $(this).val(lwMax); }
+            if (lw < lwMin) { $(this).val(lwMin); }
         });
 
         // 入力フォーム部分の下線部とか文字装飾アニメーション
