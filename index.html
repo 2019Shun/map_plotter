@@ -514,12 +514,26 @@
                     </div>
 
                     <div class="input-container">
-                        <label>マーカーの設定</label>
-                        <select class="have-ul" required id="angle-marker-selector">
-                            <option value="xxx">XXX</option>
-                            <option value="yyy">YYY</option>
-                            <option value="zzz" selected>ZZZ</option>
+                        <label>マーカータイプ</label>
+                        <select class="have-ul" required id="angle-marker-selector" disabled>
+                            <option value="v2-normal">v2</option>
+                            <option value="v3-normal" selected>v3 (normal)</option>
+                            <option value="v3-short">v3 (short)</option>
                         </select>
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <div class="input-container">
+                        <label><span id="req-red"></span>線の太さ</label>
+                        <input type="number" class="have-ul" required id="angle-marker-lw-input" value="3" min="0.1"
+                            step="0.1" placeholder="0.1以上の値" disabled />
+                        <div class="form-underline"></div>
+                    </div>
+
+                    <div class="input-container">
+                        <label><span id="req-red"></span>点の大きさ</label>
+                        <input type="number" class="have-ul" required id="angle-marker-pr-input" value="4" min="0.1"
+                            step="0.1" placeholder="0.1以上の値" disabled />
                         <div class="form-underline"></div>
                     </div>
                 </fieldset>
@@ -737,8 +751,10 @@
                     } else {
                         // 矢印の値が選択されていれば矢印を描画
                         const angIndex = parseInt($("#angle-index-selector").val());
-                        const angMarker = "HOGE@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                        plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker);
+                        const angMarker = $("#angle-marker-selector").val();
+                        const angMarkerLineWidth = parseFloat($("#angle-marker-lw-input").val());
+                        const angMarkerPointRadius = parseFloat($("#angle-marker-pr-input").val());
+                        plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker, angMarkerLineWidth, angMarkerPointRadius);
                     }
 
                     // カラーバーの作製/更新
@@ -994,7 +1010,7 @@
     };
 
     // 矢印のプロットのための関数
-    function plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker) {
+    function plotAllArrows(data, step, latIndex, lngIndex, powIndex, powMin, powMax, threshold, plotNan, fillCircle, strokeWidth, fillOpacity, strokeOpacity, radius, interpolateTheme, reverseHeatmap, noiseIndex, noiseDiff, angIndex, angMarker, angMarkerLineWidth, angMarkerPointRadius) {
         for (let i = 1; i < data.length; i += step) {
             if (data[i].length < 3) {
                 continue;
@@ -1026,59 +1042,9 @@
             const color = cvtPow2Color(pow, powMin, powMax, interpolateTheme, reverseHeatmap);
 
             // 各マーカーのSVGを設定
-            const svgMarkerV3Short = `
-<svg 
-  viewBox="0 0 48 48" 
-  fill="none" 
->
-  <g transform="rotate(${ang}, 24, 24)">
-    <circle
-       fill="${color}"
-       r="3"
-       cy="24"
-       cx="24" />
-    <path
-       stroke-linejoin="round"
-       stroke-linecap="round"
-       stroke-width="2"
-       stroke="${color}"
-       d="M 24,8.8 V 24" />
-    <path
-       stroke-linejoin="round"
-       stroke-linecap="round"
-       stroke-width="2"
-       stroke="${color}"
-       d="m 17,16 7,-7.5 7,7.5" />
-  </g>
-</svg>`;
-
-            const svgMarkerV3Normal = `
-<svg 
-  viewBox="0 0 48 48" 
-  fill="none" 
->
-  <g transform="rotate(${ang}, 24, 24)">
-    <circle
-       fill="${color}"
-       r="3"
-       cy="24"
-       cx="24" />
-    <path
-       stroke-linejoin="round"
-       stroke-linecap="round"
-       stroke-width="2"
-       stroke="${color}"
-       d="M 24,2 V 24" />
-    <path
-       stroke-linejoin="round"
-       stroke-linecap="round"
-       stroke-width="2"
-       stroke="${color}"
-       d="m 17,9.1 7,-7.5 7,7.5" />
-  </g>
-</svg>`;
-
-            const svgMarkerV2Normal = `
+            let svgMarker = "";
+            if (angMarker === "v2-normal") {
+                svgMarker = `
 <svg 
   viewBox="0 0 48 48" 
   fill="none" 
@@ -1090,22 +1056,95 @@
      stroke="${color}"
      stroke-linecap="round"
      stroke-linejoin="round"
-     stroke-width="4"
-     id="path6" />
+     stroke-width="${angMarkerLineWidth}" />
   <circle
      cx="24"
      cy="24"
-     r="4"
-     id="pointer"
+     r="${angMarkerPointRadius}"
      fill="${color}" />
   </g>
 </svg>`;
+            } else if (angMarker === "v3-normal") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <circle
+       fill="${color}"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="M 24,2 V 24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="m 17,9.1 7,-7.5 7,7.5" />
+  </g>
+</svg>`;;
+            } else if (angMarker === "v3-short") {
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <circle
+       fill="${color}"
+       r="${angMarkerPointRadius}"
+       cy="24"
+       cx="24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="M 24,8.8 V 24" />
+    <path
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="${angMarkerLineWidth}"
+       stroke="${color}"
+       d="m 17,16 7,-7.5 7,7.5" />
+  </g>
+</svg>`;
+            } else {
+                console.log("予期しない入力 @angMarker");
+                svgMarker = `
+<svg 
+  viewBox="0 0 48 48" 
+  fill="none" 
+>
+  <g transform="rotate(${ang}, 24, 24)">
+    <path
+     d="m 36,24.019918 c 0,-8.73 -12,-20.6800002 -12,-20.6800002 0,0 -12,11.9500002 -12,20.6800002 a 12,12 0 0 0 24,0 z"
+     fill="none"
+     stroke="${color}"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke-width="${angMarkerLineWidth}" />
+  <circle
+     cx="24"
+     cy="24"
+     r="${angMarkerPointRadius}"
+     fill="${color}" />
+  </g>
+</svg>`;
+            }
 
             var divicon = L.divIcon(
                 {
                     className: "",
                     iconSize: [4 * radius, 4 * radius],
-                    html: svgMarkerV2Normal,
+                    html: svgMarker,
                     iconAnchor: [2 * radius, 2 * radius]
                 }
             );
@@ -1267,6 +1306,25 @@
             } else {
                 $("#noise-diff-input").prop("disabled", false).change();
                 $("#noise-diff-input").prev().children("span").text("(必須)");
+            }
+        });
+
+        // 方位角のカラムを選択時の処理
+        $("#angle-index-selector").on("change", function () {
+            if ($(this).val() == "" || $(this).val() == null) {
+                $("#angle-marker-selector").prop("disabled", true).change();
+                $("#angle-marker-lw-input").prop("disabled", true).change();
+                $("#angle-marker-pr-input").prop("disabled", true).change();
+                $("#angle-marker-selector").prev().children("span").text("");
+                $("#angle-marker-lw-input").prev().children("span").text("");
+                $("#angle-marker-pr-input").prev().children("span").text("");
+            } else {
+                $("#angle-marker-selector").prop("disabled", false).change();
+                $("#angle-marker-lw-input").prop("disabled", false).change();
+                $("#angle-marker-pr-input").prop("disabled", false).change();
+                $("#angle-marker-selector").prev().children("span").text("(必須)");
+                $("#angle-marker-lw-input").prev().children("span").text("(必須)");
+                $("#angle-marker-pr-input").prev().children("span").text("(必須)");
             }
         });
 
